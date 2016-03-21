@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<selector xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:state_enabled="false">
+        <layer-list>
+            <item>
+                <shape android:shape="oval">
+                    <solid android:color="@color/mainLight" />
+                </shape>
+            </item>
+            <item android:bottom="@dimen/shutter_circle_margin" android:left="@dimen/shutter_circle_margin" android:right="@dimen/shutter_circle_margin" android:top="@dimen/shutter_circle_margin">
+                <shape android:shape="oval">
+                    <stroke android:width="@dimen/shutter_circle_width" android:color="@color/mainDark" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <item android:state_enabled="true" android:state_pressed="false">
+        <layer-list>
+            <item>
+                <shape android:shape="oval">
+                    <solid android:color="@color/mainLight" />
+                </shape>
+            </item>
+            <item android:bottom="@dimen/shutter_circle_margin" android:left="@dimen/shutter_circle_margin" android:right="@dimen/shutter_circle_margin" android:top="@dimen/shutter_circle_margin">
+                <shape android:shape="oval">
+                    <stroke android:width="@dimen/shutter_circle_width" android:color="?colorStyleAccent" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+    <item android:state_enabled="true" android:state_pressed="true">
+        <layer-list>
+            <item>
+                <shape android:shape="oval">
+                    <solid android:color="@color/mainLight" />
+                </shape>
+            </item>
+            <item android:bottom="@dimen/shutter_circle_margin" android:left="@dimen/shutter_circle_margin" android:right="@dimen/shutter_circle_margin" android:top="@dimen/shutter_circle_margin">
+                <shape android:shape="oval">
+                    <solid android:width="@dimen/shutter_circle_width" android:color="?colorStyleAccent" />
+                </shape>
+            </item>
+        </layer-list>
+    </item>
+</selector>

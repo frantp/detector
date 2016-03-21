@@ -4,5 +4,15 @@
     <color name="colorPrimaryDark">#303F9F</color>
     <color name="colorAccent">#FF4081</color>
 
-    <color name="black_overlay">#66000000</color>
+    <color name="detectAccent">#FF33B5E5</color>
+    <color name="detectBackground">#440099BB</color>
+    <color name="enrollAccent">#FF99CC00</color>
+    <color name="enrollBackground">#44669900</color>
+    <color name="calibrateAccent">#FFFFBB33</color>
+    <color name="calibrateBackground">#44FF8800</color>
+
+    <color name="mainLight">#FFEEEEEE</color>
+    <color name="mainDark">#FFCCCCCC</color>
+
+    <color name="globalBackground">#FF000000</color>
 </resources>

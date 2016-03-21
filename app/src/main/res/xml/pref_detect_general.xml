@@ -1,0 +1,48 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <SwitchPreference
+        android:defaultValue="@bool/pref_default_fast_matching"
+        android:key="detect_fast_matching"
+        android:title="@string/pref_title_fast_matching" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_matching_ratio"
+        android:inputType="numberDecimal"
+        android:key="detect_matching_ratio"
+        android:title="@string/pref_title_matching_ratio" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_ransac_iter_count"
+        android:inputType="number"
+        android:key="detect_ransac_iter_count"
+        android:title="@string/pref_title_ransac_iter_count" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_ransac_reprojection_error"
+        android:inputType="numberDecimal"
+        android:key="detect_ransac_reprojection_error"
+        android:title="@string/pref_title_ransac_reprojection_error" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_ransac_confidence"
+        android:inputType="numberDecimal"
+        android:key="detect_ransac_confidence"
+        android:title="@string/pref_title_ransac_confidence" />
+
+    <ListPreference
+        android:defaultValue="@string/pref_default_pnp_method"
+        android:entries="@array/pref_pnp_method_titles"
+        android:entryValues="@array/pref_pnp_method_values"
+        android:key="detect_pnp_method"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:summary="%s"
+        android:title="@string/pref_title_pnp_method" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_inliers_threshold"
+        android:inputType="number"
+        android:key="detect_inliers_threshold"
+        android:title="@string/pref_title_inliers_threshold" />
+
+</PreferenceScreen>

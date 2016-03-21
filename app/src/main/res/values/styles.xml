@@ -8,16 +8,29 @@
         <item name="colorAccent">@color/colorAccent</item>
     </style>
 
-    <style name="FullscreenTheme" parent="AppTheme">
-        <item name="android:actionBarStyle">@style/FullscreenActionBarStyle</item>
-        <item name="android:windowActionBarOverlay">true</item>
-        <item name="android:windowBackground">@null</item>
-        <item name="metaButtonBarStyle">?android:attr/buttonBarStyle</item>
-        <item name="metaButtonBarButtonStyle">?android:attr/buttonBarButtonStyle</item>
+    <style name="AppTheme.Fullscreen" parent="Theme.AppCompat.NoActionBar">
+        <!--<item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+        <item name="windowActionBarOverlay">true</item>-->
     </style>
 
-    <style name="FullscreenActionBarStyle" parent="Widget.AppCompat.ActionBar">
-        <item name="android:background">@color/black_overlay</item>
+    <style name="AppTheme.Fullscreen.Detect" parent="AppTheme.Fullscreen">
+        <item name="colorStyleAccent">@color/detectAccent</item>
+        <item name="colorStyleBackground">@color/detectBackground</item>
     </style>
+
+    <style name="AppTheme.Fullscreen.Enroll" parent="AppTheme.Fullscreen">
+        <item name="colorStyleAccent">@color/enrollAccent</item>
+        <item name="colorStyleBackground">@color/enrollBackground</item>
+    </style>
+
+    <style name="AppTheme.Fullscreen.Calibrate" parent="AppTheme.Fullscreen">
+        <item name="colorStyleAccent">@color/calibrateAccent</item>
+        <item name="colorStyleBackground">@color/calibrateBackground</item>
+    </style>
+
+    <style name="AppTheme.AppBarLayout" parent="ThemeOverlay.AppCompat.Dark" />
+
+    <style name="AppTheme.ToolbarPopup" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
 </resources>

@@ -6,3 +6,9 @@
 .DS_Store
 /build
 /captures
+
+*.cbp
+*.layout
+*.depend
+
+*~

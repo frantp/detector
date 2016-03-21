@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="pref_default_fast_matching">true</bool>
+    <string name="pref_default_matching_ratio">0.7</string>
+    <string name="pref_default_ransac_iter_count">500</string>
+    <string name="pref_default_ransac_reprojection_error">2.0</string>
+    <string name="pref_default_ransac_confidence">0.95</string>
+    <string name="pref_default_pnp_method">0</string>
+    <string name="pref_default_inliers_threshold">15</string>
+    <string name="pref_default_orb_num_features">500</string>
+    <string name="pref_default_orb_scale_factor">1.2</string>
+    <string name="pref_default_orb_num_levels">8</string>
+    <string name="pref_default_orb_edge_threshold">31</string>
+    <string name="pref_default_orb_first_level">0</string>
+    <string name="pref_default_orb_wta_k">2</string>
+    <string name="pref_default_orb_score_type">0</string>
+    <string name="pref_default_orb_patch_size">31</string>
+    <string name="pref_default_orb_fast_threshold">20</string>
+</resources>

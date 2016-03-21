@@ -1,0 +1,61 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_orb_num_features"
+        android:inputType="number"
+        android:key="enroll_orb_num_features"
+        android:title="@string/pref_title_orb_num_features" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_orb_scale_factor"
+        android:inputType="numberDecimal"
+        android:key="enroll_orb_scale_factor"
+        android:title="@string/pref_title_orb_scale_factor" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_orb_num_levels"
+        android:inputType="number"
+        android:key="enroll_orb_num_levels"
+        android:title="@string/pref_title_orb_num_levels" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_orb_edge_threshold"
+        android:inputType="number"
+        android:key="enroll_orb_edge_threshold"
+        android:title="@string/pref_title_orb_edge_threshold" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_orb_first_level"
+        android:inputType="number"
+        android:key="enroll_orb_first_level"
+        android:title="@string/pref_title_orb_first_level" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_orb_wta_k"
+        android:inputType="number"
+        android:key="enroll_orb_wta_k"
+        android:title="@string/pref_title_orb_wta_k" />
+
+    <ListPreference
+        android:defaultValue="@string/pref_default_orb_score_type"
+        android:entries="@array/pref_orb_score_type_titles"
+        android:entryValues="@array/pref_orb_score_type_values"
+        android:key="enroll_orb_score_type"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:summary="%s"
+        android:title="@string/pref_title_orb_score_type" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_orb_patch_size"
+        android:inputType="number"
+        android:key="enroll_orb_patch_size"
+        android:title="@string/pref_title_orb_patch_size" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_orb_fast_threshold"
+        android:inputType="number"
+        android:key="enroll_orb_fast_threshold"
+        android:title="@string/pref_title_orb_fast_threshold" />
+
+</PreferenceScreen>
