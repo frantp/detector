@@ -33,4 +33,9 @@
         android:icon="@android:drawable/ic_menu_preferences"
         android:title="@string/action_settings"
         app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_contours"
+        android:checkable="true"
+        android:title="Contours mode"
+        app:showAsAction="never" />
 </menu>

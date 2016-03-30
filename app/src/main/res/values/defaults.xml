@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="pref_default_resolution">640x480</string>
     <bool name="pref_default_fast_matching">true</bool>
     <string name="pref_default_matching_ratio">0.7</string>
     <string name="pref_default_ransac_iter_count">500</string>
@@ -16,4 +17,6 @@
     <string name="pref_default_orb_score_type">0</string>
     <string name="pref_default_orb_patch_size">31</string>
     <string name="pref_default_orb_fast_threshold">20</string>
+    <string name="pref_default_camera_fsx">0.879</string>
+    <string name="pref_default_camera_fsy">1.17</string>
 </resources>

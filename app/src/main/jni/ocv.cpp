@@ -142,6 +142,14 @@ JNIEXPORT void JNICALL Java_es_uvigo_fran_detector2_Detector_detect(JNIEnv* env,
     thiz->detect(image);
 }
 
+JNIEXPORT void JNICALL Java_es_uvigo_fran_detector2_Detector_contours(JNIEnv* env, jclass cls,
+    jlong addrThis, jlong addrImage)
+{
+    Detector* thiz = (Detector*)addrThis;
+    Mat image = *(Mat*)addrImage;
+    thiz->contours(image);
+}
+
 JNIEXPORT void JNICALL Java_es_uvigo_fran_detector2_Detector_destroy(JNIEnv* env, jclass cls,
     jlong addrThis)
 {

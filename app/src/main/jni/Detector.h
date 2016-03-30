@@ -19,6 +19,7 @@ class Detector {
         void load_model(const string& path);
         void init();
         void detect(Mat& image);
+        void contours(Mat& image);
 
         // ORB parameters
         int orb_num_features = 500;

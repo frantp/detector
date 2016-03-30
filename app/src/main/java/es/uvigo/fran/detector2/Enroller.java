@@ -1,7 +1,5 @@
 package es.uvigo.fran.detector2;
 
-import android.os.Environment;
-
 import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Point3;
@@ -10,34 +8,13 @@ import java.util.List;
 
 public class Enroller {
 
-
-    // Intrinsic camera parameters: UVC WEBCAM
-    private static double f = 55;                           // focal length in mm
-    private static double sx = 22.3, sy = 14.9;             // sensor size
-    private static double width = 640, height = 480;        // image size
-
-    private static double fx = width * f / sx;
-    private static double fy = height * f / sy;
-    private static double cx = width / 2;
-    private static double cy = height / 2;
-
-    //double fx = 910.3046264846927;
-    //double fy = 910.3046264846927;
-    //double cx = 639.5;
-    //double cy = 383.5;
-
-    // File paths
-    private static String modelPath = Environment.getExternalStorageDirectory() +
-            "/detector/cookies_ORB.yml";
-    //        "/detector/model.txt";
-
     static {
         System.loadLibrary("ocv");
     }
 
     private final long nativeAddr;
 
-    public Enroller() {
+    public Enroller(double fx, double fy, double cx, double cy) {
         nativeAddr = create(fx, fy, cx, cy);
     }
 

@@ -6,13 +6,10 @@ import android.view.SurfaceView;
 import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.core.Mat;
 
-/**
- * Created by fran on 11/03/16.
- */
-public class FullscreenOpenCVCameraActivity extends FullscreenOpenCVActivity
+public abstract class FullscreenOpenCVCameraActivity extends FullscreenOpenCVActivity
         implements CameraBridgeViewBase.CvCameraViewListener2 {
 
-    private static final int W = 640, H = 480;
+    private static final int DEFAULT_W = 640, DEFAULT_H = 480;
 
     private CameraBridgeViewBase mCameraView;
 
@@ -20,7 +17,7 @@ public class FullscreenOpenCVCameraActivity extends FullscreenOpenCVActivity
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         mCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_view);
-        mCameraView.setMaxFrameSize(W, H);
+        mCameraView.setMaxFrameSize(DEFAULT_W, DEFAULT_H);
         mCameraView.setVisibility(SurfaceView.VISIBLE);
         mCameraView.setCvCameraViewListener(this);
     }
@@ -49,8 +46,12 @@ public class FullscreenOpenCVCameraActivity extends FullscreenOpenCVActivity
         return inputFrame.rgba();
     }
 
+    protected CameraBridgeViewBase getCameraView() {
+        return mCameraView;
+    }
+
     @Override
-    public void init() {
+    protected void init() {
         mCameraView.enableView();
     }
 }

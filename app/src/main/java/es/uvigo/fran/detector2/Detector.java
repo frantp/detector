@@ -4,28 +4,13 @@ import org.opencv.core.Mat;
 
 class Detector {
 
-    // Intrinsic camera parameters: UVC WEBCAM
-    private static double f = 55;                           // focal length in mm
-    private static double sx = 22.3, sy = 14.9;             // sensor size
-    private static double width = 640, height = 480;        // image size
-
-    private static double fx = width * f / sx;
-    private static double fy = height * f / sy;
-    private static double cx = width / 2;
-    private static double cy = height / 2;
-
-    //double fx = 910.3046264846927;
-    //double fy = 910.3046264846927;
-    //double cx = 639.5;
-    //double cy = 383.5;
-
     static {
         System.loadLibrary("ocv");
     }
 
     private final long nativeAddr;
 
-    public Detector() {
+    public Detector(double fx, double fy, double cx, double cy) {
         nativeAddr = create(fx, fy, cx, cy);
     }
 
@@ -43,6 +28,10 @@ class Detector {
 
     public void detect(Mat frame) {
         detect(nativeAddr, frame.getNativeObjAddr());
+    }
+
+    public void contours(Mat frame) {
+        contours(nativeAddr, frame.getNativeObjAddr());
     }
 
     public void release() {
@@ -138,6 +127,8 @@ class Detector {
     private static native void init(long addrThis);
 
     private static native void detect(long addrThis, long addrImage);
+
+    private static native void contours(long addrThis, long addrImage);
 
     private static native void destroy(long addrThis);
 

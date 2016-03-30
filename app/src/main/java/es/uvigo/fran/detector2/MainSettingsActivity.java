@@ -5,6 +5,7 @@ import android.annotation.TargetApi;
 import android.content.Context;
 import android.content.Intent;
 import android.content.res.Configuration;
+import android.hardware.Camera;
 import android.media.Ringtone;
 import android.media.RingtoneManager;
 import android.net.Uri;
@@ -180,7 +181,8 @@ public class MainSettingsActivity extends AppCompatPreferenceActivity {
     protected boolean isValidFragment(String fragmentName) {
         return PreferenceFragment.class.getName().equals(fragmentName)
                 || GeneralPreferenceFragment.class.getName().equals(fragmentName)
-                || OrbPreferenceFragment.class.getName().equals(fragmentName);
+                || OrbPreferenceFragment.class.getName().equals(fragmentName)
+                || CameraPreferenceFragment.class.getName().equals(fragmentName);
     }
 
     @TargetApi(Build.VERSION_CODES.HONEYCOMB)
@@ -196,6 +198,14 @@ public class MainSettingsActivity extends AppCompatPreferenceActivity {
             // updated to reflect the new value, per the Android Design
             // guidelines.
             //bindPreferenceSummaryToValue(findPreference("example_text"));
+            List<Camera.Size> sizes = Utils.getSupportedVideoSizes();
+            String[] entries = new String[sizes.size()];
+            for (int i = 0; i < sizes.size(); i++) {
+                entries[i] = sizes.get(i).width + "x" + sizes.get(i).height;
+            }
+            ListPreference listPreference = (ListPreference) findPreference("detect_resolution");
+            listPreference.setEntries(entries);
+            listPreference.setEntryValues(entries);
         }
 
         @Override
@@ -215,6 +225,26 @@ public class MainSettingsActivity extends AppCompatPreferenceActivity {
         public void onCreate(Bundle savedInstanceState) {
             super.onCreate(savedInstanceState);
             addPreferencesFromResource(R.xml.pref_detect_orb);
+            setHasOptionsMenu(true);
+        }
+
+        @Override
+        public boolean onOptionsItemSelected(MenuItem item) {
+            int id = item.getItemId();
+            if (id == android.R.id.home) {
+                startActivity(new Intent(getActivity(), MainSettingsActivity.class));
+                return true;
+            }
+            return super.onOptionsItemSelected(item);
+        }
+    }
+
+    @TargetApi(Build.VERSION_CODES.HONEYCOMB)
+    public static class CameraPreferenceFragment extends PreferenceFragment {
+        @Override
+        public void onCreate(Bundle savedInstanceState) {
+            super.onCreate(savedInstanceState);
+            addPreferencesFromResource(R.xml.pref_camera);
             setHasOptionsMenu(true);
         }
 

@@ -79,7 +79,7 @@ void Enroller::enroll(Mat& image, const vector<Point2f>& points)
     draw2DPoints(image, outliers, RED);
     draw2DPoints(image, inliers, BLUE);
     drawObjectMesh(image, &mesh_, &pnp_, GREEN);
-    drawText(image, "Inliers: " + IntToString((int)inliers.size()), GREEN);
+    drawText1(image, "Inliers: " + IntToString((int)inliers.size()), GREEN);
     drawText2(image, "Outliers: " + IntToString((int)outliers.size()), RED);
 }
 

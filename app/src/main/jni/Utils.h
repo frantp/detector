@@ -26,7 +26,7 @@ inline bool exists(const std::string& name) {
 void drawQuestion(cv::Mat image, cv::Point3f point, cv::Scalar color);
 
 // Draw a text with the number of entered points
-void drawText(cv::Mat image, std::string text, cv::Scalar color);
+void drawText1(cv::Mat image, std::string text, cv::Scalar color);
 
 // Draw a text with the number of entered points
 void drawText2(cv::Mat image, std::string text, cv::Scalar color);

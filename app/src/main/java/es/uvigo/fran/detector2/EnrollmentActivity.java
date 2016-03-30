@@ -5,19 +5,16 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.content.pm.ActivityInfo;
 import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.drawable.BitmapDrawable;
 import android.net.Uri;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.os.Environment;
 import android.preference.PreferenceManager;
 import android.provider.MediaStore;
-import android.support.v7.app.ActionBar;
-import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
@@ -34,7 +31,6 @@ import org.opencv.core.Mat;
 import org.opencv.core.Point;
 import org.opencv.core.Point3;
 import org.opencv.core.Scalar;
-import org.opencv.imgproc.Imgproc;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,9 +40,7 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
     private static final String TAG = "ENROLLMENT";
 
     private static final int SELECT_IMAGE = 100;
-
-    //private final String imgPath = Environment.getExternalStorageDirectory() +
-    //        "/detector/image.jpg";
+    private static final Scalar COLOR = new Scalar(0, 192, 0);
 
     private static String meshPath = Environment.getExternalStorageDirectory() +
             "/detector/mesh.ply";
@@ -67,19 +61,18 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
     private ImageView mImageView;
 
     @Override
+    protected int getContentView() {
+        return R.layout.activity_enrollment;
+    }
+
+    @Override
+    protected boolean showHome() {
+        return true;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
-        setContentView(R.layout.activity_enrollment);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-        }
-
         mImageView = (ImageView) findViewById(R.id.image_view);
         mTextView = (TextView) findViewById(R.id.text_view);
         mShutterView = (ImageButton) findViewById(R.id.btn_shutter);
@@ -109,11 +102,13 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
         switch (requestCode) {
             case SELECT_IMAGE:
                 if (resultCode == Activity.RESULT_OK) {
+                    mShutterView.setEnabled(false);
                     mMenu.findItem(R.id.action_save).setVisible(false);
-                    String path = getRealPathFromUri(data.getData());
-                    Bitmap bitmap = BitmapFactory.decodeFile(path);
+                    mUserPoints.clear();
+                    mImagePath = getRealPathFromUri(data.getData());
+                    Bitmap bitmap = BitmapFactory.decodeFile(mImagePath);
+                    initEnroller(bitmap.getWidth(), bitmap.getHeight());
                     mImageView.setImageBitmap(bitmap);
-                    mImagePath = path;
                     setScaleAndOffset(bitmap.getWidth(), bitmap.getHeight(),
                             mImageView.getWidth(), mImageView.getHeight());
                     mImageView.setOnTouchListener(addPointListener);
@@ -135,7 +130,6 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
             mOffsetX = (int) (vx - ix * mScale) / 2;
             mOffsetY = 0;
         }
-        Log.e(TAG, "SCALE: " + mScale + ", xOFFSET: " + mOffsetX + ", yOFFSET: " + mOffsetY);
     }
 
     @Override
@@ -152,8 +146,6 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
         switch (item.getItemId()) {
             case R.id.action_new:
                 if (!isInitialized()) break;
-                mShutterView.setEnabled(false);
-                mUserPoints.clear();
                 Intent imagePickerIntent = new Intent(Intent.ACTION_PICK);
                 imagePickerIntent.setType("image/*");
                 startActivityForResult(imagePickerIntent, SELECT_IMAGE);
@@ -186,6 +178,7 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
                                             }
                                         })
                                         .show();
+                                setVisibility();
                             }
                         })
                         .setItems(modelNames, new DialogInterface.OnClickListener() {
@@ -212,9 +205,11 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
                                             }
                                         })
                                         .show();
+                                setVisibility();
                             }
                         })
                         .show();
+                setVisibility();
                 break;
             case R.id.action_settings:
                 startActivity(new Intent(this, EnrollmentSettingsActivity.class));
@@ -224,9 +219,16 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
     }
 
     @Override
-    public void init() {
+    protected void init() {
+    }
+
+    private void initEnroller(int width, int height) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mEnroller = new Enroller();
+        double fsx = Double.parseDouble(prefs.getString("camera_fsx",
+                getResources().getString(R.string.pref_default_camera_fsx)));
+        double fsy = Double.parseDouble(prefs.getString("camera_fsy",
+                getResources().getString(R.string.pref_default_camera_fsy)));
+        mEnroller = new Enroller(fsx * width, fsy * height, width / 2, height / 2);
         mEnroller.loadMesh(meshPath);
         mEnroller.setOrbNumFeatures(Integer.parseInt(prefs.getString("enroll_orb_num_features",
                 getResources().getString(R.string.pref_default_orb_num_features))));
@@ -254,57 +256,111 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
     private View.OnTouchListener addPointListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
+            Point touch = new Point(
+                    (event.getX() - mOffsetX) / mScale,
+                    (event.getY() - mOffsetY) / mScale
+            );
+            if (touch.x < 0 || (mImage != null && touch.x > mImage.width()) ||
+                    touch.y < 0 || (mImage != null && touch.y > mImage.height())) {
+                return false;
+            }
+            mMenu.findItem(R.id.action_save).setVisible(false);
             if (mUserPoints.isEmpty()) {
                 if (mImagePath != null) {
                     Bitmap bitmap = ((BitmapDrawable) mImageView.getDrawable()).getBitmap();
+                    if (mImage != null) mImage.release();
                     mImage = new Mat();
                     org.opencv.android.Utils.bitmapToMat(bitmap, mImage);
                 }
             }
-            mUserPoints.add(new Point(
-                    (event.getX() - mOffsetX) / mScale,
-                    (event.getY() - mOffsetY) / mScale
-            ));
-            updateImage(mUserPoints);
             if (mUserPoints.size() < mMeshPoints.length) {
-                updateText(mMeshPoints[mUserPoints.size()]);
+                mUserPoints.add(touch);
+                if (mUserPoints.size() < mMeshPoints.length) {
+                    updateText(mMeshPoints[mUserPoints.size()]);
+                } else {
+                    mTextView.setText("Move points or press shutter to process");
+                    mShutterView.setEnabled(true);
+                }
+                updateImage(mUserPoints);
+                return false;
             } else {
-                mImageView.setOnTouchListener(null);
+                // Get closest point
+                double mind2 = Double.MAX_VALUE;
+                Point minp = null;
+                for (Point p : mUserPoints) {
+                    double dx = touch.x - p.x;
+                    double dy = touch.y - p.y;
+                    double d2 = dx * dx + dy * dy;
+                    if (d2 < mind2) {
+                        mind2 = d2;
+                        minp = p;
+                    }
+                }
+
+                // Threshold
+                int th = Utils.pointThreshold(mImage);
+                if (mind2 < th * th) {
+                    minp.x = touch.x;
+                    minp.y = touch.y;
+                    updateImage(mUserPoints);
+                }
                 mShutterView.setEnabled(true);
+                return true;
             }
-            return false;
         }
     };
 
     private View.OnTouchListener processListener = new View.OnTouchListener() {
         @Override
         public boolean onTouch(View v, MotionEvent event) {
-            //Toast.makeText(EnrollmentActivity.this, "Processing...", Toast.LENGTH_SHORT).show();
+            mShutterView.setEnabled(false);
+            Toast.makeText(EnrollmentActivity.this, "Processing...", Toast.LENGTH_SHORT).show();
             mTextView.setText("Processing...");
-            Mat displayImage = mImage.clone();
-            mEnroller.enroll(displayImage, mUserPoints);
-            updateImage(displayImage);
-            mTextView.setText("Done");
-            mMenu.findItem(R.id.action_save).setVisible(true);
+            new AsyncEnrollUpdate().execute();
             return false;
         }
     };
 
     private void updateText(Point3 p) {
-        mTextView.setText("Point (" + p.x + ", " + p.y + ", " + p.z + ")");
+        mTextView.setText("Point (" + Utils.format(p) + ")");
     }
 
     public void updateImage(List<Point> points) {
         Mat displayImage = mImage.clone();
-        for (Point p : points) {
-            Imgproc.circle(displayImage, p, 4, new Scalar(255, 0, 0), -1, 8, 0);
-        }
+        drawPoints(displayImage);
         updateImage(displayImage);
+        displayImage.release();
     }
 
     private void updateImage(Mat image) {
         Bitmap bitmap = ((BitmapDrawable) mImageView.getDrawable()).getBitmap();
         org.opencv.android.Utils.matToBitmap(image, bitmap);
         mImageView.setImageBitmap(bitmap);
+    }
+
+    private void drawPoints(Mat image) {
+        for (int i = 0; i < mUserPoints.size(); i++) {
+            Utils.drawPointWithLabel(image, mUserPoints.get(i), Utils.format(mMeshPoints[i]), COLOR);
+        }
+    }
+
+    private class AsyncEnrollUpdate extends AsyncTask<Void, Void, Void> {
+        private Mat displayImage;
+
+        @Override
+        protected Void doInBackground(Void... params) {
+            displayImage = mImage.clone();
+            mEnroller.enroll(displayImage, mUserPoints);
+            drawPoints(displayImage);
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(Void aVoid) {
+            updateImage(displayImage);
+            displayImage.release();
+            mTextView.setText("Done");
+            mMenu.findItem(R.id.action_save).setVisible(true);
+        }
     }
 }

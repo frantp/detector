@@ -1,0 +1,15 @@
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_camera_fsx"
+        android:inputType="number"
+        android:key="camera_fsx"
+        android:title="@string/pref_title_fsx" />
+
+    <EditTextPreference
+        android:defaultValue="@string/pref_default_camera_fsy"
+        android:inputType="number"
+        android:key="camera_fsy"
+        android:title="@string/pref_title_fsy" />
+
+</PreferenceScreen>

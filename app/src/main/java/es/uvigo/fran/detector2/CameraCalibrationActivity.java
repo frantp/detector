@@ -14,102 +14,57 @@
 package es.uvigo.fran.detector2;
 
 import android.app.ProgressDialog;
+import android.content.SharedPreferences;
 import android.content.res.Resources;
 import android.os.AsyncTask;
 import android.os.Bundle;
-import android.support.v7.app.ActionBar;
-import android.support.v7.app.AppCompatActivity;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.MotionEvent;
-import android.view.SurfaceView;
 import android.view.View;
-import android.view.View.OnTouchListener;
-import android.view.WindowManager;
+import android.widget.ImageButton;
 import android.widget.Toast;
 
-import org.opencv.android.BaseLoaderCallback;
-import org.opencv.android.CameraBridgeViewBase;
 import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
-import org.opencv.android.CameraBridgeViewBase.CvCameraViewListener2;
-import org.opencv.android.LoaderCallbackInterface;
-import org.opencv.android.OpenCVLoader;
 import org.opencv.core.Mat;
 
-public class CameraCalibrationActivity extends AppCompatActivity implements CvCameraViewListener2, OnTouchListener {
+public class CameraCalibrationActivity extends FullscreenOpenCVCameraActivity {
     private static final String TAG = "OCVSample::Activity";
 
-    private CameraBridgeViewBase mOpenCvCameraView;
     private CameraCalibrator mCalibrator;
     private OnCameraFrameRender mOnCameraFrameRender;
     private int mWidth;
     private int mHeight;
 
-    private BaseLoaderCallback mLoaderCallback = new BaseLoaderCallback(this) {
-        @Override
-        public void onManagerConnected(int status) {
-            switch (status) {
-                case LoaderCallbackInterface.SUCCESS: {
-                    Log.i(TAG, "OpenCV loaded successfully");
-                    mOpenCvCameraView.enableView();
-                    mOpenCvCameraView.setOnTouchListener(CameraCalibrationActivity.this);
-                }
-                break;
-                default: {
-                    super.onManagerConnected(status);
-                }
-                break;
-            }
-        }
-    };
+    private ImageButton mShutterView;
 
-    public CameraCalibrationActivity() {
-        Log.i(TAG, "Instantiated new " + this.getClass());
+    @Override
+    protected int getContentView() {
+        return R.layout.activity_camera_calibration;
+    }
+
+    @Override
+    protected boolean showHome() {
+        return true;
     }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        Log.i(TAG, "called onCreate");
         super.onCreate(savedInstanceState);
-        getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
 
-        setContentView(R.layout.camera_calibration_surface_view);
+        int[] size = Utils.getCurrentVideoSize(this);
+        getCameraView().setMaxFrameSize(size[0], size[1]);
 
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.show();
-        }
-
-        mOpenCvCameraView = (CameraBridgeViewBase) findViewById(R.id.camera_calibration_java_surface_view);
-        mOpenCvCameraView.setVisibility(SurfaceView.VISIBLE);
-        mOpenCvCameraView.setCvCameraViewListener(this);
+        mShutterView = (ImageButton) findViewById(R.id.btn_shutter);
+        mShutterView.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mCalibrator.addCorners();
+            }
+        });
     }
 
-    @Override
-    public void onPause() {
-        super.onPause();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
-    }
-
-    @Override
-    public void onResume() {
-        super.onResume();
-        if (!OpenCVLoader.initDebug()) {
-            Log.d(TAG, "Internal OpenCV library not found. Using OpenCV Manager for initialization");
-            OpenCVLoader.initAsync(OpenCVLoader.OPENCV_VERSION_3_1_0, this, mLoaderCallback);
-        } else {
-            Log.d(TAG, "OpenCV library found inside package. Using it!");
-            mLoaderCallback.onManagerConnected(LoaderCallbackInterface.SUCCESS);
-        }
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
-        if (mOpenCvCameraView != null)
-            mOpenCvCameraView.disableView();
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -122,15 +77,13 @@ public class CameraCalibrationActivity extends AppCompatActivity implements CvCa
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
-        menu.findItem(R.id.preview_mode).setEnabled(true);
-        if (!mCalibrator.isCalibrated())
-            menu.findItem(R.id.preview_mode).setEnabled(false);
-
+        menu.findItem(R.id.preview_mode).setEnabled(mCalibrator.isCalibrated());
         return true;
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
+        setVisibility();
         switch (item.getItemId()) {
             case R.id.calibration:
                 mOnCameraFrameRender =
@@ -182,19 +135,21 @@ public class CameraCalibrationActivity extends AppCompatActivity implements CvCa
                         String resultMessage = (mCalibrator.isCalibrated()) ?
                                 res.getString(R.string.calibration_successful) + " " + mCalibrator.getAvgReprojectionError() :
                                 res.getString(R.string.calibration_unsuccessful);
-                        (Toast.makeText(CameraCalibrationActivity.this, resultMessage, Toast.LENGTH_SHORT)).show();
+                        Toast.makeText(CameraCalibrationActivity.this, resultMessage, Toast.LENGTH_SHORT).show();
 
                         if (mCalibrator.isCalibrated()) {
                             double[] buffer = new double[9];
                             mCalibrator.getCameraMatrix().get(0, 0, buffer);
                             Log.e(TAG, "fx = " + buffer[0]);
                             Log.e(TAG, "fy = " + buffer[4]);
-                            Log.e(TAG, "cx = " + buffer[2]);
-                            Log.e(TAG, "cy = " + buffer[5]);
-                            try {
-                                Thread.sleep(5000);
-                            } catch (InterruptedException e) {
-                            }
+                            int[] size = Utils.getCurrentVideoSize(CameraCalibrationActivity.this);
+                            SharedPreferences prefs = PreferenceManager
+                                    .getDefaultSharedPreferences(CameraCalibrationActivity.this);
+                            SharedPreferences.Editor editor = prefs.edit();
+                            editor.putString("camera_fsx", String.valueOf(buffer[0] / size[0]));
+                            editor.putString("camera_fsy", String.valueOf(buffer[4] / size[1]));
+                            editor.apply();
+
                             CalibrationResult.save(CameraCalibrationActivity.this,
                                     mCalibrator.getCameraMatrix(), mCalibrator.getDistortionCoefficients());
                         }
@@ -224,13 +179,5 @@ public class CameraCalibrationActivity extends AppCompatActivity implements CvCa
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         return mOnCameraFrameRender.render(inputFrame);
-    }
-
-    @Override
-    public boolean onTouch(View v, MotionEvent event) {
-        Log.d(TAG, "onTouch invoked");
-
-        mCalibrator.addCorners();
-        return false;
     }
 }

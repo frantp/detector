@@ -7,7 +7,7 @@
     android:theme="@style/AppTheme.AppBarLayout"
     app:elevation="0dp">
 
-    <android.support.v7.widget.Toolbar
+    <es.uvigo.fran.detector2.TransparentToolbar
         android:id="@+id/toolbar"
         android:layout_width="match_parent"
         android:layout_height="?attr/actionBarSize"

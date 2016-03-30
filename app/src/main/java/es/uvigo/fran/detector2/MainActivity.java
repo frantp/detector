@@ -19,6 +19,9 @@ import org.opencv.core.Mat;
 public class MainActivity extends FullscreenOpenCVCameraActivity {
 
     private static final String TAG = "MAIN";
+
+    private Menu mMenu;
+
     private Detector mDetector;
     private boolean mStarted;
 
@@ -30,6 +33,16 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
             "/detector/mesh.ply";
 
     @Override
+    protected int getContentView() {
+        return R.layout.activity_main;
+    }
+
+    @Override
+    protected boolean showHome() {
+        return false;
+    }
+
+    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         if (savedInstanceState != null) {
@@ -37,6 +50,9 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
         } else {
             mStarted = false;
         }
+
+        int[] size = Utils.getCurrentVideoSize(this);
+        getCameraView().setMaxFrameSize(size[0], size[1]);
 
         mTextView = (TextView) findViewById(R.id.text_view);
         mShutterView = (ImageButton) findViewById(R.id.btn_shutter);
@@ -54,6 +70,7 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.menu_main, menu);
+        mMenu = menu;
         MenuItem item = menu.findItem(R.id.action_start_stop);
         if (mStarted) {
             item.setIcon(android.R.drawable.ic_media_pause);
@@ -102,6 +119,7 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
                             }
                         })
                         .show();
+                setVisibility();
                 break;
             case R.id.action_enroll:
                 if (!isInitialized()) break;
@@ -114,6 +132,9 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
             case R.id.action_settings:
                 startActivity(new Intent(this, MainSettingsActivity.class));
                 break;
+            case R.id.action_contours:
+                item.setChecked(!item.isChecked());
+                break;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -122,7 +143,12 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
     public void init() {
         super.init();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        mDetector = new Detector();
+        int[] size = Utils.getCurrentVideoSize(this);
+        double fsx = Double.parseDouble(prefs.getString("camera_fsx",
+                getResources().getString(R.string.pref_default_camera_fsx)));
+        double fsy = Double.parseDouble(prefs.getString("camera_fsy",
+                getResources().getString(R.string.pref_default_camera_fsy)));
+        mDetector = new Detector(fsx * size[0], fsy * size[1], size[0] / 2, size[1] / 2);
         mDetector.loadMesh(meshPath);
         mDetector.setOrbNumFeatures(Integer.parseInt(prefs.getString("detect_orb_num_features",
                 getResources().getString(R.string.pref_default_orb_num_features))));
@@ -162,7 +188,13 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
     @Override
     public Mat onCameraFrame(CameraBridgeViewBase.CvCameraViewFrame inputFrame) {
         Mat frame = inputFrame.rgba();
-        if (mStarted) mDetector.detect(frame);
+        if (mStarted) {
+            if (mMenu != null && mMenu.findItem(R.id.action_contours).isChecked()) {
+                mDetector.contours(frame);
+            } else {
+                mDetector.detect(frame);
+            }
+        }
         return frame;
     }
 }
