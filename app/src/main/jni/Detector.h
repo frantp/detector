@@ -14,7 +14,7 @@ using namespace cv;
 
 class Detector {
     public:
-        Detector(double* params_camera);
+        Detector(const double* params_camera, double* dist_coeffs, std::size_t num_coeffs);
         void load_mesh(const string& path);
         void load_model(const string& path);
         void init();

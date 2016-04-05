@@ -33,6 +33,7 @@ import org.opencv.core.Point3;
 import org.opencv.core.Scalar;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class EnrollmentActivity extends FullscreenOpenCVActivity {
@@ -224,11 +225,26 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
 
     private void initEnroller(int width, int height) {
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        double fsx = Double.parseDouble(prefs.getString("camera_fsx",
-                getResources().getString(R.string.pref_default_camera_fsx)));
-        double fsy = Double.parseDouble(prefs.getString("camera_fsy",
-                getResources().getString(R.string.pref_default_camera_fsy)));
-        mEnroller = new Enroller(fsx * width, fsy * height, width / 2, height / 2);
+        int[] size = Utils.getCurrentVideoSize(this);
+        double nfx = Double.parseDouble(prefs.getString("camera_nfx",
+                getResources().getString(R.string.pref_default_camera_nfx)));
+        double nfy = Double.parseDouble(prefs.getString("camera_nfy",
+                getResources().getString(R.string.pref_default_camera_nfy)));
+        double ncx = Double.parseDouble(prefs.getString("camera_ncx",
+                getResources().getString(R.string.pref_default_camera_ncx)));
+        double ncy = Double.parseDouble(prefs.getString("camera_ncy",
+                getResources().getString(R.string.pref_default_camera_ncy)));
+        double[] cameraParams = new double[]{
+                nfx * size[0], nfy * size[1], ncx * size[0], ncy * size[1]
+        };
+        int dcn = Integer.parseInt(prefs.getString("camera_dcn",
+                getResources().getString(R.string.pref_default_camera_dcn)));
+        double[] distCoeffs = new double[dcn];
+        for (int i = 0; i < dcn; i++) {
+            distCoeffs[i] = Double.parseDouble(prefs.getString("camera_dc" + i,
+                    getResources().getString(R.string.pref_default_camera_dci)));
+        }
+        mEnroller = new Enroller(cameraParams, distCoeffs);
         mEnroller.loadMesh(meshPath);
         mEnroller.setOrbNumFeatures(Integer.parseInt(prefs.getString("enroll_orb_num_features",
                 getResources().getString(R.string.pref_default_orb_num_features))));
@@ -281,7 +297,7 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
                     mTextView.setText("Move points or press shutter to process");
                     mShutterView.setEnabled(true);
                 }
-                updateImage(mUserPoints);
+                updateImage();
                 return false;
             } else {
                 // Get closest point
@@ -302,7 +318,7 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
                 if (mind2 < th * th) {
                     minp.x = touch.x;
                     minp.y = touch.y;
-                    updateImage(mUserPoints);
+                    updateImage();
                 }
                 mShutterView.setEnabled(true);
                 return true;
@@ -325,7 +341,7 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
         mTextView.setText("Point (" + Utils.format(p) + ")");
     }
 
-    public void updateImage(List<Point> points) {
+    public void updateImage() {
         Mat displayImage = mImage.clone();
         drawPoints(displayImage);
         updateImage(displayImage);
@@ -350,7 +366,7 @@ public class EnrollmentActivity extends FullscreenOpenCVActivity {
         @Override
         protected Void doInBackground(Void... params) {
             displayImage = mImage.clone();
-            mEnroller.enroll(displayImage, mUserPoints);
+            mEnroller.enroll(displayImage, Arrays.asList(mMeshPoints), mUserPoints);
             drawPoints(displayImage);
             return null;
         }

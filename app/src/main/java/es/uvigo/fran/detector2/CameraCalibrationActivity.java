@@ -30,7 +30,7 @@ import org.opencv.android.CameraBridgeViewBase.CvCameraViewFrame;
 import org.opencv.core.Mat;
 
 public class CameraCalibrationActivity extends FullscreenOpenCVCameraActivity {
-    private static final String TAG = "OCVSample::Activity";
+    private static final String TAG = "CAMERA CALIBRATION";
 
     private CameraCalibrator mCalibrator;
     private OnCameraFrameRender mOnCameraFrameRender;
@@ -138,20 +138,32 @@ public class CameraCalibrationActivity extends FullscreenOpenCVCameraActivity {
                         Toast.makeText(CameraCalibrationActivity.this, resultMessage, Toast.LENGTH_SHORT).show();
 
                         if (mCalibrator.isCalibrated()) {
-                            double[] buffer = new double[9];
-                            mCalibrator.getCameraMatrix().get(0, 0, buffer);
-                            Log.e(TAG, "fx = " + buffer[0]);
-                            Log.e(TAG, "fy = " + buffer[4]);
                             int[] size = Utils.getCurrentVideoSize(CameraCalibrationActivity.this);
                             SharedPreferences prefs = PreferenceManager
                                     .getDefaultSharedPreferences(CameraCalibrationActivity.this);
                             SharedPreferences.Editor editor = prefs.edit();
-                            editor.putString("camera_fsx", String.valueOf(buffer[0] / size[0]));
-                            editor.putString("camera_fsy", String.valueOf(buffer[4] / size[1]));
-                            editor.apply();
 
-                            CalibrationResult.save(CameraCalibrationActivity.this,
-                                    mCalibrator.getCameraMatrix(), mCalibrator.getDistortionCoefficients());
+                            Mat cameraParams = mCalibrator.getCameraMatrix();
+                            double[] bufferC = new double[9];
+                            cameraParams.get(0, 0, bufferC);
+                            Log.e(TAG, "nfx = " + bufferC[0] / size[0]);
+                            editor.putString("camera_nfx", String.valueOf(bufferC[0] / size[0]));
+                            Log.e(TAG, "nfy = " + bufferC[4] / size[1]);
+                            editor.putString("camera_nfy", String.valueOf(bufferC[4] / size[1]));
+                            Log.e(TAG, "ncx = " + bufferC[2] / size[0]);
+                            editor.putString("camera_ncx", String.valueOf(bufferC[2] / size[0]));
+                            Log.e(TAG, "ncy = " + bufferC[5] / size[1]);
+                            editor.putString("camera_ncy", String.valueOf(bufferC[5] / size[1]));
+
+                            Mat distCoeffs = mCalibrator.getDistortionCoefficients();
+                            double[] bufferD = new double[(int) distCoeffs.total()];
+                            distCoeffs.get(0, 0, bufferD);
+                            editor.putString("camera_dcn", String.valueOf(bufferD.length));
+                            for (int i = 0; i < bufferD.length; i++) {
+                                Log.e(TAG, "dc" + i + " = " + bufferD[i]);
+                                editor.putString("camera_dc" + i, String.valueOf(bufferD[i]));
+                            }
+                            editor.apply();
                         }
                     }
                 }.execute();
@@ -169,7 +181,6 @@ public class CameraCalibrationActivity extends FullscreenOpenCVCameraActivity {
             if (CalibrationResult.tryLoad(this, mCalibrator.getCameraMatrix(), mCalibrator.getDistortionCoefficients())) {
                 mCalibrator.setCalibrated();
             }
-
             mOnCameraFrameRender = new OnCameraFrameRender(new CalibrationFrameRender(mCalibrator));
         }
     }

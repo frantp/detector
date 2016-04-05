@@ -1,6 +1,7 @@
 #include <jni.h>
 
 #include <opencv2/core/core.hpp>
+#include <stdexcept>
 
 #include "Enroller.h"
 #include "Detector.h"
@@ -15,10 +16,12 @@ using namespace cv;
 extern "C" {
 
 JNIEXPORT jlong JNICALL Java_es_uvigo_fran_detector2_Enroller_create(JNIEnv* env, jclass cls,
-    jdouble fx, jdouble fy, jdouble cx, jdouble cy)
+    jdoubleArray cameraParams, jdoubleArray distCoeffs)
 {
-    double camera_params[] = {fx, fy, cx, cy};
-    Enroller* enroller = new Enroller(camera_params); //************************************************************
+    jdouble* camera_params = env->GetDoubleArrayElements(cameraParams, NULL);
+    jdouble* dist_coeffs = env->GetDoubleArrayElements(distCoeffs, NULL);
+    jsize num_coeffs = env->GetArrayLength(distCoeffs);
+    Enroller* enroller = new Enroller(camera_params, dist_coeffs, num_coeffs);
     return (jlong)enroller;
 }
 
@@ -74,18 +77,31 @@ JNIEXPORT void JNICALL Java_es_uvigo_fran_detector2_Enroller_init(JNIEnv* env, j
 }
 
 JNIEXPORT void JNICALL Java_es_uvigo_fran_detector2_Enroller_enroll(JNIEnv* env, jclass cls,
-    jlong addrThis, jlong addrImage, jdoubleArray pointsX, jdoubleArray pointsY)
+    jlong addrThis, jlong addrImage,
+    jdoubleArray points3dX, jdoubleArray points3dY, jdoubleArray points3dZ,
+    jdoubleArray points2dX, jdoubleArray points2dY)
 {
     Enroller* thiz = (Enroller*)addrThis;
     Mat image = *(Mat*)addrImage;
-    vector<Point2f> points;
-    jsize len = env->GetArrayLength(pointsX);
-    jdouble* points_x = env->GetDoubleArrayElements(pointsX, NULL);
-    jdouble* points_y = env->GetDoubleArrayElements(pointsY, NULL);
-    for (unsigned int i = 0; i < len; ++i) {
-        points.push_back(Point2f(points_x[i], points_y[i]));
+    jsize len = env->GetArrayLength(points3dX);
+    if (len != env->GetArrayLength(points2dX)) {
+        throw new std::invalid_argument("Points3d ans Points2d sizes differ");
     }
-    thiz->enroll(image, points);
+
+    vector<Point3f> points3d;
+    jdouble* points3d_x = env->GetDoubleArrayElements(points3dX, NULL);
+    jdouble* points3d_y = env->GetDoubleArrayElements(points3dY, NULL);
+    jdouble* points3d_z = env->GetDoubleArrayElements(points3dZ, NULL);
+    for (unsigned int i = 0; i < len; ++i) {
+        points3d.push_back(Point3f(points3d_x[i], points3d_y[i], points3d_z[i]));
+    }
+    vector<Point2f> points2d;
+    jdouble* points2d_x = env->GetDoubleArrayElements(points2dX, NULL);
+    jdouble* points2d_y = env->GetDoubleArrayElements(points2dY, NULL);
+    for (unsigned int i = 0; i < len; ++i) {
+        points2d.push_back(Point2f(points2d_x[i], points2d_y[i]));
+    }
+    thiz->enroll(image, points3d, points2d);
 }
 
 JNIEXPORT void JNICALL Java_es_uvigo_fran_detector2_Enroller_saveModel(JNIEnv* env, jclass cls,
@@ -104,10 +120,12 @@ JNIEXPORT void JNICALL Java_es_uvigo_fran_detector2_Enroller_destroy(JNIEnv* env
 }
 
 JNIEXPORT jlong JNICALL Java_es_uvigo_fran_detector2_Detector_create(JNIEnv* env, jclass cls,
-    jdouble fx, jdouble fy, jdouble cx, jdouble cy)
+    jdoubleArray cameraParams, jdoubleArray distCoeffs)
 {
-    double camera_params[] = {fx, fy, cx, cy};
-    Detector* detector = new Detector(camera_params);
+    jdouble* camera_params = env->GetDoubleArrayElements(cameraParams, NULL);
+    jdouble* dist_coeffs = env->GetDoubleArrayElements(distCoeffs, NULL);
+    jsize num_coeffs = env->GetArrayLength(distCoeffs);
+    Detector* detector = new Detector(camera_params, dist_coeffs, num_coeffs);
     return (jlong)detector;
 }
 

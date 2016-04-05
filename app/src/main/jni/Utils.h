@@ -68,12 +68,15 @@ cv::Mat rot2euler(const cv::Mat & rotationMatrix);
 cv::Mat euler2rot(const cv::Mat & euler);
 
 // Converts a given string to an integer
-int StringToInt ( const std::string &Text );
+int StringToInt(const std::string &Text);
+
+// Converts a given Mat to a string
+std::string MatToString(const cv::Mat& mat);
 
 // Converts a given float to a string
-std::string FloatToString ( float Number );
+std::string FloatToString(float Number);
 
 // Converts a given integer to a string
-std::string IntToString ( int Number );
+std::string IntToString(int Number);
 
 #endif /* UTILS_H_ */

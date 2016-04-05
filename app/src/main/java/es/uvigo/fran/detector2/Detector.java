@@ -10,8 +10,8 @@ class Detector {
 
     private final long nativeAddr;
 
-    public Detector(double fx, double fy, double cx, double cy) {
-        nativeAddr = create(fx, fy, cx, cy);
+    public Detector(double[] cameraParams, double[] distCoeffs) {
+        nativeAddr = create(cameraParams, distCoeffs);
     }
 
     public void loadMesh(String path) {
@@ -118,7 +118,7 @@ class Detector {
         return this;
     }
 
-    private static native long create(double fx, double fy, double cx, double cy);
+    private static native long create(double[] cameraParams, double[] distCoeffs);
 
     private static native void loadMesh(long addrThis, String path);
 

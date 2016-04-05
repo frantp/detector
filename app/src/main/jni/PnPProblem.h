@@ -19,7 +19,7 @@ class PnPProblem
 {
 
 public:
-  explicit PnPProblem(const double param[]);  // custom constructor
+  explicit PnPProblem(const double* camera_params, double* dist_coeffs, std::size_t num_coeffs);
   virtual ~PnPProblem();
 
   bool backproject2DPoint(const Mesh *mesh, const cv::Point2f &point2d, cv::Point3f &point3d);
@@ -27,9 +27,9 @@ public:
   std::vector<cv::Point2f> verify_points(Mesh *mesh);
   cv::Point2f backproject3DPoint(const cv::Point3f &point3d);
   bool estimatePose(const std::vector<cv::Point3f> &list_points3d, const std::vector<cv::Point2f> &list_points2d, int flags);
-  void estimatePoseRANSAC( const std::vector<cv::Point3f> &list_points3d, const std::vector<cv::Point2f> &list_points2d,
-                           int flags, cv::Mat &inliers,
-                           int iterationsCount, float reprojectionError, double confidence );
+  void estimatePoseRANSAC(const std::vector<cv::Point3f> &list_points3d, const std::vector<cv::Point2f> &list_points2d,
+                          int flags, cv::Mat &inliers,
+                          int iterationsCount, float reprojectionError, double confidence);
 
   cv::Mat get_A_matrix() const { return _A_matrix; }
   cv::Mat get_R_matrix() const { return _R_matrix; }
@@ -47,6 +47,8 @@ private:
   cv::Mat _t_matrix;
   /** The computed projection matrix */
   cv::Mat _P_matrix;
+  /** The distortion coefficients matrix */
+  cv::Mat _d_matrix;
 };
 
 // Functions for Möller–Trumbore intersection algorithm

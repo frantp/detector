@@ -4,8 +4,8 @@
 #include "matching.h"
 
 
-Detector::Detector(double* params_camera)
-    : pnp_(params_camera)
+Detector::Detector(const double* params_camera, double* dist_coeffs, std::size_t num_coeffs)
+    : pnp_(params_camera, dist_coeffs, num_coeffs)
     , mesh_loaded_(false)
     , model_loaded_(false)
     , initialized_(false)

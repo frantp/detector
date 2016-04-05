@@ -5,13 +5,9 @@
 #include "Utils.h"
 #include "matching.h"
 
-#include <android/log.h>
-#define LOG_TAG "NATIVE"
-#define LOGD(...) ((void)__android_log_print(ANDROID_LOG_DEBUG, LOG_TAG, __VA_ARGS__))
 
-
-Enroller::Enroller(double* params_camera)
-    : pnp_(params_camera)
+Enroller::Enroller(const double* params_camera, double* dist_coeffs, std::size_t num_coeffs)
+    : pnp_(params_camera, dist_coeffs, num_coeffs)
     , mesh_loaded_(false)
     , initialized_(false)
 {
@@ -45,13 +41,13 @@ vector<Point3f> Enroller::get_points() const
     return mesh_.getVertexList();
 }
 
-void Enroller::enroll(Mat& image, const vector<Point2f>& points)
+void Enroller::enroll(Mat& image, const vector<Point3f>& points3d, const vector<Point2f>& points2d)
 {
     if (!mesh_loaded_ || !initialized_) return;
 
     // Estimate pose given the registered points
     bool is_correspondence = pnp_.estimatePose(
-        mesh_.getVertexList(), points, SOLVEPNP_ITERATIVE);
+        points3d, points2d, SOLVEPNP_ITERATIVE);
 
     // Compute keypoints and descriptors
     vector<KeyPoint> keypoints = get_keypoints(image, detector_);

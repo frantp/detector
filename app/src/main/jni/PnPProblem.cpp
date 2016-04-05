@@ -69,18 +69,18 @@ cv::Point3f get_nearest_3D_point(std::vector<cv::Point3f> &points_list, cv::Poin
 
 // Custom constructor given the intrinsic camera parameters
 
-PnPProblem::PnPProblem(const double params[])
+PnPProblem::PnPProblem(const double* camera_params, double* dist_coeffs, std::size_t num_coeffs)
 {
-  _A_matrix = cv::Mat::zeros(3, 3, CV_64FC1);   // intrinsic camera parameters
-  _A_matrix.at<double>(0, 0) = params[0];       //      [ fx   0  cx ]
-  _A_matrix.at<double>(1, 1) = params[1];       //      [  0  fy  cy ]
-  _A_matrix.at<double>(0, 2) = params[2];       //      [  0   0   1 ]
-  _A_matrix.at<double>(1, 2) = params[3];
-  _A_matrix.at<double>(2, 2) = 1;
-  _R_matrix = cv::Mat::zeros(3, 3, CV_64FC1);   // rotation matrix
-  _t_matrix = cv::Mat::zeros(3, 1, CV_64FC1);   // translation matrix
-  _P_matrix = cv::Mat::zeros(3, 4, CV_64FC1);   // rotation-translation matrix
-
+    _A_matrix = cv::Mat::zeros(3, 3, CV_64FC1);    // intrinsic camera parameters
+    _A_matrix.at<double>(0, 0) = camera_params[0]; //      [ fx   0  cx ]
+    _A_matrix.at<double>(1, 1) = camera_params[1]; //      [  0  fy  cy ]
+    _A_matrix.at<double>(0, 2) = camera_params[2]; //      [  0   0   1 ]
+    _A_matrix.at<double>(1, 2) = camera_params[3];
+    _A_matrix.at<double>(2, 2) = 1;
+    _R_matrix = cv::Mat::zeros(3, 3, CV_64FC1);    // rotation matrix
+    _t_matrix = cv::Mat::zeros(3, 1, CV_64FC1);    // translation matrix
+    _P_matrix = cv::Mat::zeros(3, 4, CV_64FC1);    // rotation-translation matrix
+    _d_matrix = cv::Mat(num_coeffs, 1, CV_64FC1, dist_coeffs); // distortion coefficients
 }
 
 PnPProblem::~PnPProblem()
@@ -88,47 +88,49 @@ PnPProblem::~PnPProblem()
   // TODO Auto-generated destructor stub
 }
 
-void PnPProblem::set_P_matrix( const cv::Mat &R_matrix, const cv::Mat &t_matrix)
+void PnPProblem::set_P_matrix(const cv::Mat &R_matrix, const cv::Mat &t_matrix)
 {
-  // Rotation-Translation Matrix Definition
-  _P_matrix.at<double>(0,0) = R_matrix.at<double>(0,0);
-  _P_matrix.at<double>(0,1) = R_matrix.at<double>(0,1);
-  _P_matrix.at<double>(0,2) = R_matrix.at<double>(0,2);
-  _P_matrix.at<double>(1,0) = R_matrix.at<double>(1,0);
-  _P_matrix.at<double>(1,1) = R_matrix.at<double>(1,1);
-  _P_matrix.at<double>(1,2) = R_matrix.at<double>(1,2);
-  _P_matrix.at<double>(2,0) = R_matrix.at<double>(2,0);
-  _P_matrix.at<double>(2,1) = R_matrix.at<double>(2,1);
-  _P_matrix.at<double>(2,2) = R_matrix.at<double>(2,2);
-  _P_matrix.at<double>(0,3) = t_matrix.at<double>(0);
-  _P_matrix.at<double>(1,3) = t_matrix.at<double>(1);
-  _P_matrix.at<double>(2,3) = t_matrix.at<double>(2);
+    // Rotation-Translation Matrix Definition
+    _P_matrix.at<double>(0, 0) = R_matrix.at<double>(0, 0);
+    _P_matrix.at<double>(0, 1) = R_matrix.at<double>(0, 1);
+    _P_matrix.at<double>(0, 2) = R_matrix.at<double>(0, 2);
+    _P_matrix.at<double>(1, 0) = R_matrix.at<double>(1, 0);
+    _P_matrix.at<double>(1, 1) = R_matrix.at<double>(1, 1);
+    _P_matrix.at<double>(1, 2) = R_matrix.at<double>(1, 2);
+    _P_matrix.at<double>(2, 0) = R_matrix.at<double>(2, 0);
+    _P_matrix.at<double>(2, 1) = R_matrix.at<double>(2, 1);
+    _P_matrix.at<double>(2, 2) = R_matrix.at<double>(2, 2);
+    _P_matrix.at<double>(0, 3) = t_matrix.at<double>(0);
+    _P_matrix.at<double>(1, 3) = t_matrix.at<double>(1);
+    _P_matrix.at<double>(2, 3) = t_matrix.at<double>(2);
 }
 
 
 // Estimate the pose given a list of 2D/3D correspondences and the method to use
-bool PnPProblem::estimatePose( const std::vector<cv::Point3f> &list_points3d,
-                               const std::vector<cv::Point2f> &list_points2d,
-                               int flags)
+bool PnPProblem::estimatePose(const std::vector<cv::Point3f> &list_points3d,
+                              const std::vector<cv::Point2f> &list_points2d,
+                              int flags)
 {
-  cv::Mat distCoeffs = cv::Mat::zeros(4, 1, CV_64FC1);
-  cv::Mat rvec = cv::Mat::zeros(3, 1, CV_64FC1);
-  cv::Mat tvec = cv::Mat::zeros(3, 1, CV_64FC1);
+    cv::Mat rvec = cv::Mat::zeros(3, 1, CV_64FC1);
+    cv::Mat tvec = cv::Mat::zeros(3, 1, CV_64FC1);
 
-  bool useExtrinsicGuess = false;
+    bool useExtrinsicGuess = false;
 
-  // Pose estimation
-  bool correspondence = cv::solvePnP( list_points3d, list_points2d, _A_matrix, distCoeffs, rvec, tvec,
-                                      useExtrinsicGuess, flags);
+    // Pose estimation
 
-  // Transforms Rotation Vector to Matrix
-  Rodrigues(rvec,_R_matrix);
-  _t_matrix = tvec;
+    LOGE("%s", MatToString(_d_matrix).c_str());
 
-  // Set projection matrix
-  this->set_P_matrix(_R_matrix, _t_matrix);
+    bool correspondence = cv::solvePnP(list_points3d, list_points2d, _A_matrix, _d_matrix, rvec, tvec,
+                                       useExtrinsicGuess, flags);
 
-  return correspondence;
+    // Transforms Rotation Vector to Matrix
+    Rodrigues(rvec,_R_matrix);
+    _t_matrix = tvec;
+
+    // Set projection matrix
+    this->set_P_matrix(_R_matrix, _t_matrix);
+
+    return correspondence;
 }
 
 // Estimate the pose given a list of 2D/3D correspondences with RANSAC and the method to use
@@ -138,21 +140,20 @@ void PnPProblem::estimatePoseRANSAC( const std::vector<cv::Point3f> &list_points
                                      int flags, cv::Mat &inliers, int iterationsCount,  // PnP method; inliers container
                                      float reprojectionError, double confidence )    // Ransac parameters
 {
-  cv::Mat distCoeffs = cv::Mat::zeros(4, 1, CV_64FC1);  // vector of distortion coefficients
-  cv::Mat rvec = cv::Mat::zeros(3, 1, CV_64FC1);          // output rotation vector
-  cv::Mat tvec = cv::Mat::zeros(3, 1, CV_64FC1);    // output translation vector
+    cv::Mat rvec = cv::Mat::zeros(3, 1, CV_64FC1);          // output rotation vector
+    cv::Mat tvec = cv::Mat::zeros(3, 1, CV_64FC1);    // output translation vector
 
-  bool useExtrinsicGuess = false;   // if true the function uses the provided rvec and tvec values as
+    bool useExtrinsicGuess = false;   // if true the function uses the provided rvec and tvec values as
             // initial approximations of the rotation and translation vectors
 
-  cv::solvePnPRansac( list_points3d, list_points2d, _A_matrix, distCoeffs, rvec, tvec,
-                useExtrinsicGuess, iterationsCount, reprojectionError, confidence,
-                inliers, flags );
+    cv::solvePnPRansac(list_points3d, list_points2d, _A_matrix, _d_matrix, rvec, tvec,
+                       useExtrinsicGuess, iterationsCount, reprojectionError, confidence,
+                       inliers, flags);
 
-  Rodrigues(rvec,_R_matrix);      // converts Rotation Vector to Matrix
-  _t_matrix = tvec;       // set translation matrix
+    Rodrigues(rvec,_R_matrix);      // converts Rotation Vector to Matrix
+    _t_matrix = tvec;       // set translation matrix
 
-  this->set_P_matrix(_R_matrix, _t_matrix); // set rotation-translation matrix
+    this->set_P_matrix(_R_matrix, _t_matrix); // set rotation-translation matrix
 
 }
 

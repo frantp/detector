@@ -17,7 +17,7 @@ import java.io.File;
 import java.text.DecimalFormat;
 import java.util.List;
 
-class Utils {
+abstract class Utils {
     private static String MODELS_FOLDER_NAME = "models";
     private static DecimalFormat NUM_FORMAT = new DecimalFormat("#.##");
     private static int FONT_FACE = Core.FONT_HERSHEY_SIMPLEX;

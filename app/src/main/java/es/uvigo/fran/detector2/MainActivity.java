@@ -144,11 +144,25 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
         super.init();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         int[] size = Utils.getCurrentVideoSize(this);
-        double fsx = Double.parseDouble(prefs.getString("camera_fsx",
-                getResources().getString(R.string.pref_default_camera_fsx)));
-        double fsy = Double.parseDouble(prefs.getString("camera_fsy",
-                getResources().getString(R.string.pref_default_camera_fsy)));
-        mDetector = new Detector(fsx * size[0], fsy * size[1], size[0] / 2, size[1] / 2);
+        double nfx = Double.parseDouble(prefs.getString("camera_nfx",
+                getResources().getString(R.string.pref_default_camera_nfx)));
+        double nfy = Double.parseDouble(prefs.getString("camera_nfy",
+                getResources().getString(R.string.pref_default_camera_nfy)));
+        double ncx = Double.parseDouble(prefs.getString("camera_ncx",
+                getResources().getString(R.string.pref_default_camera_ncx)));
+        double ncy = Double.parseDouble(prefs.getString("camera_ncy",
+                getResources().getString(R.string.pref_default_camera_ncy)));
+        double[] cameraParams = new double[]{
+                nfx * size[0], nfy * size[1], ncx * size[0], ncy * size[1]
+        };
+        int dcn = Integer.parseInt(prefs.getString("camera_dcn",
+                getResources().getString(R.string.pref_default_camera_dcn)));
+        double[] distCoeffs = new double[dcn];
+        for (int i = 0; i < dcn; i++) {
+            distCoeffs[i] = Double.parseDouble(prefs.getString("camera_dc" + i,
+                    getResources().getString(R.string.pref_default_camera_dci)));
+        }
+        mDetector = new Detector(cameraParams, distCoeffs);
         mDetector.loadMesh(meshPath);
         mDetector.setOrbNumFeatures(Integer.parseInt(prefs.getString("detect_orb_num_features",
                 getResources().getString(R.string.pref_default_orb_num_features))));

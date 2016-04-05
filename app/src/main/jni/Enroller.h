@@ -13,11 +13,11 @@ using namespace cv;
 
 class Enroller {
     public:
-        Enroller(double* params_camera);
+        Enroller(const double* params_camera, double* dist_coeffs, std::size_t num_coeffs);
         void load_mesh(const string& path);
         void init();
         vector<Point3f> get_points() const;
-        void enroll(Mat& image, const vector<Point2f>& points);
+        void enroll(Mat& image, const vector<Point3f>& points3d, const vector<Point2f>& points2d);
         void save_model(const string& path, bool update);
 
         // ORB parameters

@@ -189,6 +189,14 @@ int StringToInt(const std::string& Text)
     return ss >> result ? result : 0;
 }
 
+// Converts a given Mat to a string
+std::string MatToString(const cv::Mat& mat)
+{
+    std::ostringstream ss;
+    ss << mat;
+    return ss.str();
+}
+
 // Converts a given float to a string
 std::string FloatToString(float Number)
 {
