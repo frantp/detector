@@ -3,7 +3,7 @@
 
 #include <iostream>
 #include <fstream>
-#include <opencv2/core/core.hpp>
+#include <opencv2/core.hpp>
 #include "Utils.h"
 
 using namespace std;
@@ -28,7 +28,7 @@ public:
   * @param list_triangle - The container of the triangles list of the mesh
   * @return
   */
-  void readPLY(vector<Point3f> &list_vertex, vector<vector<int> > &list_triangles);
+  void readPLY(vector<Point3f> &vertex, vector<vector<int> > &triangles, vector<Point3f> &key_vertices);
 
 private:
   /** The current stream file for the reader */

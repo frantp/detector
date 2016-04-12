@@ -2,9 +2,19 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
-        android:id="@+id/action_new"
-        android:icon="@android:drawable/ic_menu_add"
+        android:id="@+id/action_start"
+        android:icon="@android:drawable/ic_media_play"
         android:title="@string/action_new"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_load"
+        android:icon="@android:drawable/ic_menu_gallery"
+        android:title="@string/action_load"
+        app:showAsAction="ifRoom" />
+    <item
+        android:id="@+id/action_delete"
+        android:icon="@android:drawable/ic_menu_delete"
+        android:title="@string/action_delete"
         app:showAsAction="ifRoom" />
     <item
         android:id="@+id/action_save"

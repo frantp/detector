@@ -7,7 +7,7 @@ CsvReader::CsvReader(const string &path, const char &separator){
 }
 
 /* Read a plane text file with .ply format */
-void CsvReader::readPLY(vector<Point3f> &list_vertex, vector<vector<int> > &list_triangles)
+void CsvReader::readPLY(vector<Point3f> &vertices, vector<vector<int> > &triangles, vector<Point3f> &key_vertices)
 {
     std::string line, tmp_str, n;
     int num_vertices = 0, num_faces = 0;
@@ -33,19 +33,25 @@ void CsvReader::readPLY(vector<Point3f> &list_vertex, vector<vector<int> > &list
             if (tmp_str == "end_header") end_header = true;
         }
 
-        // read vertex and add into 'list_vertex'
+        // read vertex and add into 'vertices'
         else if (!end_vertices)
         {
-            string x, y, z;
+            string x, y, z, rem;
             getline(liness, x, separator_);
             getline(liness, y, separator_);
-            getline(liness, z);
+            getline(liness, z, separator_);
+            getline(liness, rem);
 
             cv::Point3f tmp_p;
             tmp_p.x = (float)StringToInt(x);
             tmp_p.y = (float)StringToInt(y);
             tmp_p.z = (float)StringToInt(z);
-            list_vertex.push_back(tmp_p);
+            vertices.push_back(tmp_p);
+
+            if (rem.find("!") != string::npos)
+            {
+                key_vertices.push_back(tmp_p);
+            }
 
             count++;
             if (count == num_vertices)
@@ -54,7 +60,7 @@ void CsvReader::readPLY(vector<Point3f> &list_vertex, vector<vector<int> > &list
                 end_vertices = true;
             }
         }
-        // read faces and add into 'list_triangles'
+        // read faces and add into 'triangles'
         else
         {
             string num_pts_face_str;
@@ -68,7 +74,7 @@ void CsvReader::readPLY(vector<Point3f> &list_vertex, vector<vector<int> > &list
             {
                 getline(liness, tmp_str, separator_);
                 int ptC = StringToInt(tmp_str);
-                list_triangles.push_back({ptA, ptB, ptC});
+                triangles.push_back({ptA, ptB, ptC});
                 ptB = ptC;
             }
 

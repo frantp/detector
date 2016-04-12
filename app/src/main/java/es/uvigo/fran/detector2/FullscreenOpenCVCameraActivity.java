@@ -13,6 +13,10 @@ public abstract class FullscreenOpenCVCameraActivity extends FullscreenOpenCVAct
 
     private CameraBridgeViewBase mCameraView;
 
+    public FullscreenOpenCVCameraActivity(int contentView, boolean showHome) {
+        super(contentView, showHome);
+    }
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -25,11 +29,6 @@ public abstract class FullscreenOpenCVCameraActivity extends FullscreenOpenCVAct
     @Override
     public void onPause() {
         super.onPause();
-        if (mCameraView != null) mCameraView.disableView();
-    }
-
-    public void onDestroy() {
-        super.onDestroy();
         if (mCameraView != null) mCameraView.disableView();
     }
 
@@ -48,10 +47,5 @@ public abstract class FullscreenOpenCVCameraActivity extends FullscreenOpenCVAct
 
     protected CameraBridgeViewBase getCameraView() {
         return mCameraView;
-    }
-
-    @Override
-    protected void init() {
-        mCameraView.enableView();
     }
 }

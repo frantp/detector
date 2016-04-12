@@ -39,14 +39,8 @@ public class CameraCalibrationActivity extends FullscreenOpenCVCameraActivity {
 
     private ImageButton mShutterView;
 
-    @Override
-    protected int getContentView() {
-        return R.layout.activity_camera_calibration;
-    }
-
-    @Override
-    protected boolean showHome() {
-        return true;
+    public CameraCalibrationActivity() {
+        super(R.layout.activity_camera_calibration, true);
     }
 
     @Override
@@ -190,5 +184,10 @@ public class CameraCalibrationActivity extends FullscreenOpenCVCameraActivity {
 
     public Mat onCameraFrame(CvCameraViewFrame inputFrame) {
         return mOnCameraFrameRender.render(inputFrame);
+    }
+
+    @Override
+    protected void init() {
+        getCameraView().enableView();
     }
 }

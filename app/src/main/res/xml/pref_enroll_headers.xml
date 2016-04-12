@@ -10,6 +10,11 @@
     <header
         android:fragment="es.uvigo.fran.detector2.EnrollmentSettingsActivity$OrbPreferenceFragment"
         android:icon="@drawable/ic_notifications_black_24dp"
-        android:title="@string/pref_header_features" />
+        android:title="@string/pref_header_orb_features" />
+
+    <header
+        android:fragment="es.uvigo.fran.detector2.EnrollmentSettingsActivity$AkazePreferenceFragment"
+        android:icon="@drawable/ic_notifications_black_24dp"
+        android:title="@string/pref_header_akaze_features" />
 
 </preference-headers>

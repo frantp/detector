@@ -10,4 +10,14 @@
         android:summary="%s"
         android:title="@string/pref_title_pnp_method" />
 
+    <ListPreference
+        android:defaultValue="@string/pref_default_descriptor_alg"
+        android:entries="@array/pref_descriptor_type_titles"
+        android:entryValues="@array/pref_descriptor_type_values"
+        android:key="enroll_descriptor_alg"
+        android:negativeButtonText="@null"
+        android:positiveButtonText="@null"
+        android:summary="%s"
+        android:title="@string/pref_title_descriptor_type" />
+
 </PreferenceScreen>

@@ -1,12 +1,14 @@
 #ifndef __ENROLLER_H
 #define __ENROLLER_H
 
-#include <opencv2/core/core.hpp>
-#include <opencv2/features2d/features2d.hpp>
+#include <opencv2/core.hpp>
+#include <opencv2/features2d.hpp>
+#include <opencv2/calib3d.hpp>
 
 #include "Model.h"
 #include "Mesh.h"
 #include "PnPProblem.h"
+#include "parameters.h"
 
 using namespace std;
 using namespace cv;
@@ -20,23 +22,20 @@ class Enroller {
         void enroll(Mat& image, const vector<Point3f>& points3d, const vector<Point2f>& points2d);
         void save_model(const string& path, bool update);
 
-        // ORB parameters
-        int orb_num_features = 500;
-		float orb_scale_factor = 1.2f;
-		int orb_num_levels = 8;
-		int orb_edge_threshold = 31;
-		int orb_first_level = 0;
-		int orb_WTA_K = 2;
-		int orb_score_type = ORB::HARRIS_SCORE;
-		int orb_patch_size = 31;
-		int orb_fast_threshold = 20;
+        int descriptor_alg = 0;
+        ORBParams orb_params;
+        AKAZEParams akaze_params;
+
+        // PnP parameters
+        int pnp_method = SOLVEPNP_ITERATIVE;
 
     private:
         bool mesh_loaded_, initialized_;
         Mesh mesh_;
         Model model_;
-        Ptr<FeatureDetector> detector_;
-        Ptr<DescriptorExtractor> extractor_;
+        //Ptr<FeatureDetector> detector_;
+        //Ptr<DescriptorExtractor> extractor_;
+        Ptr<Feature2D> alg_;
         PnPProblem pnp_;
 };
 

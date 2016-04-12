@@ -65,7 +65,7 @@ void draw2DPoints(cv::Mat image, std::vector<cv::Point2f>& list_points, cv::Scal
 void drawObjectMesh(cv::Mat image, const Mesh* mesh, PnPProblem* pnpProblem, cv::Scalar color)
 {
     int t = t_(image);
-    std::vector<std::vector<int> > list_triangles = mesh->getTrianglesList();
+    std::vector<std::vector<int> > list_triangles = mesh->getTriangles();
     for (size_t i = 0; i < list_triangles.size(); i++)
     {
         std::vector<int> tmp_triangle = list_triangles.at(i);

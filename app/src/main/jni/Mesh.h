@@ -64,24 +64,20 @@ public:
   Mesh();
   virtual ~Mesh();
 
-  std::vector<cv::Point3f> getVertexList() const { return list_vertex_; }
-  std::vector<std::vector<int> > getTrianglesList() const { return list_triangles_; }
-  cv::Point3f getVertex(int pos) const { return list_vertex_[pos]; }
-  int getNumVertices() const { return num_vertexs_; }
+  std::vector<cv::Point3f> getVertices() const { return vertices_; }
+  std::vector<std::vector<int>> getTriangles() const { return triangles_; }
+  std::vector<cv::Point3f> getKeyVertices() const { return key_vertices_; }
+  cv::Point3f getVertex(int pos) const { return vertices_[pos]; }
 
   void load(const std::string path_file);
 
 private:
-  /** The identification number of the mesh */
-  int id_;
-  /** The current number of vertices in the mesh */
-  int num_vertexs_;
-  /** The current number of triangles in the mesh */
-  int num_triangles_;
   /* The list of triangles of the mesh */
-  std::vector<cv::Point3f> list_vertex_;
+  std::vector<cv::Point3f> vertices_;
   /* The list of triangles of the mesh */
-  std::vector<std::vector<int> > list_triangles_;
+  std::vector<std::vector<int>> triangles_;
+
+  std::vector<cv::Point3f> key_vertices_;
 };
 
 #endif /* OBJECTMESH_H_ */

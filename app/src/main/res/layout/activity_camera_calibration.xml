@@ -5,12 +5,10 @@
     android:background="@color/globalBackground"
     android:orientation="horizontal">
 
-    <org.opencv.android.JavaCameraView
+    <es.uvigo.fran.detector2.CustomJavaCameraView
         android:id="@+id/camera_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/sidebar_view"
-        android:layout_toStartOf="@+id/sidebar_view"
         android:visibility="visible"
         app:camera_id="back"
         app:show_fps="true" />
@@ -19,7 +17,6 @@
         android:id="@+id/content_view"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_toLeftOf="@+id/sidebar_view"
         android:layout_toStartOf="@+id/sidebar_view">
 
         <include
@@ -41,5 +38,5 @@
         android:layout_width="@dimen/sidebar_width"
         android:layout_height="match_parent"
         android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true" />
+        android:layout_marginEnd="@dimen/navigation_bar_width" />
 </RelativeLayout>

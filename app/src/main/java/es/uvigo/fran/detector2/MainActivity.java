@@ -32,20 +32,14 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
     private static String meshPath = Environment.getExternalStorageDirectory() +
             "/detector/mesh.ply";
 
-    @Override
-    protected int getContentView() {
-        return R.layout.activity_main;
-    }
-
-    @Override
-    protected boolean showHome() {
-        return false;
+    public MainActivity() {
+        super(R.layout.activity_main, false);
     }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        if (savedInstanceState != null) {
+        if (savedInstanceState != null) { ////////////////////////////
             mStarted = savedInstanceState.getBoolean("started");
         } else {
             mStarted = false;
@@ -111,6 +105,7 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
                         .setItems(modelNames, new DialogInterface.OnClickListener() {
                             @Override
                             public void onClick(DialogInterface dialog, int which) {
+                                setVisibility();
                                 String modelPath = Utils.modelPath(MainActivity.this, modelNames[which]);
                                 mDetector.loadModel(modelPath);
                                 Toast.makeText(MainActivity.this,
@@ -141,7 +136,7 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
 
     @Override
     public void init() {
-        super.init();
+        getCameraView().enableView();
         SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
         int[] size = Utils.getCurrentVideoSize(this);
         double nfx = Double.parseDouble(prefs.getString("camera_nfx",
@@ -164,6 +159,24 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
         }
         mDetector = new Detector(cameraParams, distCoeffs);
         mDetector.loadMesh(meshPath);
+
+        mDetector.setMatchingRatio(Double.parseDouble(prefs.getString("detect_matching_ratio",
+                getResources().getString(R.string.pref_default_matching_ratio))));
+        mDetector.setFastMatching(prefs.getBoolean("detect_fast_matching",
+                getResources().getBoolean(R.bool.pref_default_fast_matching)));
+        mDetector.setRansacIterCount(Integer.parseInt(prefs.getString("detect_ransac_iter_count",
+                getResources().getString(R.string.pref_default_ransac_iter_count))));
+        mDetector.setRansacReprojectionError(Double.parseDouble(prefs.getString("detect_ransac_reprojection_error",
+                getResources().getString(R.string.pref_default_ransac_reprojection_error))));
+        mDetector.setRansacConfidence(Double.parseDouble(prefs.getString("detect_ransac_confidence",
+                getResources().getString(R.string.pref_default_ransac_confidence))));
+        mDetector.setPnpMethod(Integer.parseInt(prefs.getString("detect_pnp_method",
+                getResources().getString(R.string.pref_default_pnp_method))));
+        mDetector.setInliersThreshold(Integer.parseInt(prefs.getString("detect_inliers_threshold",
+                getResources().getString(R.string.pref_default_inliers_threshold))));
+        mDetector.setDescriptorAlg(Integer.parseInt(prefs.getString("detect_descriptor_alg",
+                getResources().getString(R.string.pref_default_descriptor_alg))));
+
         mDetector.setOrbNumFeatures(Integer.parseInt(prefs.getString("detect_orb_num_features",
                 getResources().getString(R.string.pref_default_orb_num_features))));
         mDetector.setOrbScaleFactor(Double.parseDouble(prefs.getString("detect_orb_scale_factor",
@@ -182,20 +195,22 @@ public class MainActivity extends FullscreenOpenCVCameraActivity {
                 getResources().getString(R.string.pref_default_orb_patch_size))));
         mDetector.setOrbFastThreshold(Integer.parseInt(prefs.getString("detect_orb_fast_threshold",
                 getResources().getString(R.string.pref_default_orb_fast_threshold))));
-        mDetector.setMatchingRatio(Double.parseDouble(prefs.getString("detect_matching_ratio",
-                getResources().getString(R.string.pref_default_matching_ratio))));
-        mDetector.setFastMatching(prefs.getBoolean("detect_fast_matching",
-                getResources().getBoolean(R.bool.pref_default_fast_matching)));
-        mDetector.setRansacIterCount(Integer.parseInt(prefs.getString("detect_ransac_iter_count",
-                getResources().getString(R.string.pref_default_ransac_iter_count))));
-        mDetector.setRansacReprojectionError(Double.parseDouble(prefs.getString("detect_ransac_reprojection_error",
-                getResources().getString(R.string.pref_default_ransac_reprojection_error))));
-        mDetector.setRansacConfidence(Double.parseDouble(prefs.getString("detect_ransac_confidence",
-                getResources().getString(R.string.pref_default_ransac_confidence))));
-        mDetector.setPnpMethod(Integer.parseInt(prefs.getString("detect_pnp_method",
-                getResources().getString(R.string.pref_default_pnp_method))));
-        mDetector.setInliersThreshold(Integer.parseInt(prefs.getString("detect_inliers_threshold",
-                getResources().getString(R.string.pref_default_inliers_threshold))));
+
+        mDetector.setAkazeDescriptorType(Integer.parseInt(prefs.getString("detect_akaze_descriptor_type",
+                getResources().getString(R.string.pref_default_akaze_descriptor_type))));
+        mDetector.setAkazeDescriptorSize(Integer.parseInt(prefs.getString("detect_akaze_descriptor_size",
+                getResources().getString(R.string.pref_default_akaze_descriptor_size))));
+        mDetector.setAkazeDescriptorChannels(Integer.parseInt(prefs.getString("detect_akaze_descriptor_channels",
+                getResources().getString(R.string.pref_default_akaze_descriptor_channels))));
+        mDetector.setAkazeThreshold(Double.parseDouble(prefs.getString("detect_akaze_threshold",
+                getResources().getString(R.string.pref_default_akaze_threshold))));
+        mDetector.setAkazeNOctaves(Integer.parseInt(prefs.getString("detect_akaze_n_octaves",
+                getResources().getString(R.string.pref_default_akaze_n_octaves))));
+        mDetector.setAkazeNOctaveLayers(Integer.parseInt(prefs.getString("detect_akaze_n_octave_layers",
+                getResources().getString(R.string.pref_default_akaze_n_octave_layers))));
+        mDetector.setAkazeDiffusivity(Integer.parseInt(prefs.getString("detect_akaze_diffusivity",
+                getResources().getString(R.string.pref_default_akaze_diffusivity))));
+
         mDetector.init();
     }
 

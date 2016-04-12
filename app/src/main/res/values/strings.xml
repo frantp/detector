@@ -11,13 +11,15 @@
     <string name="calibrate_button">Calibrate camera</string>
     <string name="dummy_content">DUMMY\nCONTENT</string>
 
+    <string name="action_select_model">Select model</string>
     <string name="action_start">Start</string>
     <string name="action_stop">Stop</string>
-    <string name="action_select_model">Select model</string>
-    <string name="action_enroll">Register/Update model</string>
+    <string name="action_enroll">Manage models</string>
     <string name="action_calibrate">Calibrate camera</string>
     <string name="action_settings">Settings</string>
     <string name="action_new">New image</string>
+    <string name="action_load">Load model</string>
+    <string name="action_delete">Delete model</string>
     <string name="action_save">Save model</string>
 
     <string name="select_model_title">Select model</string>
@@ -25,6 +27,7 @@
     <string name="new_model">New model</string>
     <string name="model_loaded">Model loaded</string>
     <string name="model_saved">Model saved</string>
+    <string name="model_deleted">Model deleted</string>
     <string name="new_model_title">New model</string>
     <string name="existing_model_title">Existing model</string>
     <string name="overwrite">Overwrite</string>
@@ -72,11 +75,20 @@
         <item>4</item>
     </string-array>
     <string name="pref_title_inliers_threshold">Inliers threshold</string>
+    <string name="pref_title_descriptor_type">Descriptor type</string>
+    <string-array name="pref_descriptor_type_titles">
+        <item>ORB</item>
+        <item>AKAZE</item>
+    </string-array>
+    <string-array name="pref_descriptor_type_values">
+        <item>0</item>
+        <item>1</item>
+    </string-array>
 
     <string name="pref_title_fsx">Focal length / sensor width</string>
     <string name="pref_title_fsy">Focal length / sensor height</string>
 
-    <string name="pref_header_features">Features</string>
+    <string name="pref_header_orb_features">ORB Features</string>
     <string name="pref_title_orb_num_features">Number of features</string>
     <string name="pref_title_orb_scale_factor">Scale factor</string>
     <string name="pref_title_orb_num_levels">Number of levels</string>
@@ -94,6 +106,39 @@
     </string-array>
     <string name="pref_title_orb_patch_size">Patch size</string>
     <string name="pref_title_orb_fast_threshold">Fast threshold</string>
+
+    <string name="pref_header_akaze_features">AKAZE Features</string>
+    <string name="pref_title_akaze_descriptor_type">Descriptor type</string>
+    <string-array name="pref_akaze_descriptor_type_titles">
+        <item>KAZE Upright</item>
+        <item>KAZE</item>
+        <item>MLDB Upright</item>
+        <item>MLDB</item>
+    </string-array>
+    <string-array name="pref_akaze_descriptor_type_values">
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+    <string name="pref_title_akaze_descriptor_size">Descriptor size</string>
+    <string name="pref_title_akaze_descriptor_channels">Descriptor channels</string>
+    <string name="pref_title_akaze_threshold">Threshold</string>
+    <string name="pref_title_akaze_n_octaves">Num. octaves</string>
+    <string name="pref_title_akaze_n_octave_layers">Num. octave layers</string>
+    <string name="pref_title_akaze_diffusivity">Diffusivity</string>
+    <string-array name="pref_akaze_diffusivity_titles">
+        <item>PM G1</item>
+        <item>PM G2</item>
+        <item>Weickert</item>
+        <item>Charbonnier</item>
+    </string-array>
+    <string-array name="pref_akaze_diffusivity_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+    </string-array>
 
     <string name="pref_ringtone_silent">Silent</string>
 

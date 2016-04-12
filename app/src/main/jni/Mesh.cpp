@@ -47,11 +47,8 @@ Ray::~Ray()
 // --------------------------------------------------- //
 
 /** The default constructor of the ObjectMesh Class */
-Mesh::Mesh() : list_vertex_(0) , list_triangles_(0)
+Mesh::Mesh() : vertices_(0) , triangles_(0), key_vertices_(0)
 {
-  id_ = 0;
-  num_vertexs_ = 0;
-  num_triangles_ = 0;
 }
 
 /** The default destructor of the ObjectMesh Class */
@@ -69,14 +66,11 @@ void Mesh::load(const std::string path)
   CsvReader csvReader(path);
 
   // Clear previous data
-  list_vertex_.clear();
-  list_triangles_.clear();
+  vertices_.clear();
+  triangles_.clear();
+  key_vertices_.clear();
 
   // Read from .ply file
-  csvReader.readPLY(list_vertex_, list_triangles_);
-
-  // Update mesh attributes
-  num_vertexs_ = (int)list_vertex_.size();
-  num_triangles_ = (int)list_triangles_.size();
+  csvReader.readPLY(vertices_, triangles_, key_vertices_);
 
 }

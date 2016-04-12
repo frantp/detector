@@ -8,6 +8,8 @@
     <string name="pref_default_ransac_confidence">0.95</string>
     <string name="pref_default_pnp_method">0</string>
     <string name="pref_default_inliers_threshold">15</string>
+    <string name="pref_default_descriptor_alg">0</string>
+
     <string name="pref_default_orb_num_features">500</string>
     <string name="pref_default_orb_scale_factor">1.2</string>
     <string name="pref_default_orb_num_levels">8</string>
@@ -17,6 +19,15 @@
     <string name="pref_default_orb_score_type">0</string>
     <string name="pref_default_orb_patch_size">31</string>
     <string name="pref_default_orb_fast_threshold">20</string>
+
+    <string name="pref_default_akaze_descriptor_type">5</string>
+    <string name="pref_default_akaze_descriptor_size">0</string>
+    <string name="pref_default_akaze_descriptor_channels">3</string>
+    <string name="pref_default_akaze_threshold">0.001</string>
+    <string name="pref_default_akaze_n_octaves">4</string>
+    <string name="pref_default_akaze_n_octave_layers">4</string>
+    <string name="pref_default_akaze_diffusivity">1</string>
+
     <string name="pref_default_camera_nfx">0.879</string>
     <string name="pref_default_camera_nfy">1.17</string>
     <string name="pref_default_camera_ncx">0.499</string>

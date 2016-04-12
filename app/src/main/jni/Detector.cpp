@@ -3,6 +3,8 @@
 #include "Utils.h"
 #include "matching.h"
 
+#include <opencv2/imgproc.hpp>
+
 
 Detector::Detector(const double* params_camera, double* dist_coeffs, std::size_t num_coeffs)
     : pnp_(params_camera, dist_coeffs, num_coeffs)
@@ -26,18 +28,33 @@ void Detector::load_model(const std::string& path)
 
 void Detector::init()
 {
-    detector_ = ORB::create(
-        orb_num_features,
-        orb_scale_factor,
-        orb_num_levels,
-        orb_edge_threshold,
-        orb_first_level,
-        orb_WTA_K,
-        orb_score_type,
-        orb_patch_size,
-        orb_fast_threshold
-    );
-    extractor_ = detector_;
+    switch (descriptor_alg) {
+    default:
+    case 0:
+        alg_ = ORB::create(
+            orb_params.num_features,
+            orb_params.scale_factor,
+            orb_params.num_levels,
+            orb_params.edge_threshold,
+            orb_params.first_level,
+            orb_params.WTA_K,
+            orb_params.score_type,
+            orb_params.patch_size,
+            orb_params.fast_threshold
+        );
+        break;
+    case 1:
+        alg_ = AKAZE::create(
+            akaze_params.descriptor_type,
+            akaze_params.descriptor_size,
+            akaze_params.descriptor_channels,
+            akaze_params.threshold,
+            akaze_params.nOctaves,
+            akaze_params.nOctaveLayers,
+            akaze_params.diffusivity
+        );
+        break;
+    }
     Ptr<flann::IndexParams> indexParams = makePtr<flann::LshIndexParams>(6, 12, 1);
     Ptr<flann::SearchParams> searchParams = makePtr<flann::SearchParams>(50);
     matcher_ = makePtr<FlannBasedMatcher>(indexParams, searchParams);
@@ -48,9 +65,15 @@ void Detector::detect(Mat& image)
 {
     if (!mesh_loaded_ || !model_loaded_ || !initialized_) return;
 
+    Mat image_gray;
+    cvtColor(image, image_gray, CV_RGBA2GRAY);
+
     // Robust matching between scene descriptors and model descriptors
-    vector<KeyPoint> keypoints_image = get_keypoints(image, detector_);
-    Mat descriptors_image = get_descriptors(image, keypoints_image, extractor_);
+    //vector<KeyPoint> keypoints_image = get_keypoints(image, detector_);
+    //Mat descriptors_image = get_descriptors(image, keypoints_image, extractor_);
+    vector<KeyPoint> keypoints_image;
+    Mat descriptors_image;
+    alg_->detectAndCompute(image_gray, noArray(), keypoints_image, descriptors_image);
     vector<DMatch> matches = robust_match(descriptors_image, model_.get_descriptors(), matcher_,
         matching_ratio, fast_matching);
 
@@ -94,8 +117,6 @@ void Detector::detect(Mat& image)
     drawText1(image, "Inliers:  " + inliers_str, BLUE);
     drawText2(image, "Outliers: " + outliers_str, RED);
 }
-
-#include <opencv2/imgproc.hpp>
 
 double minth = 50;
 double maxth = 100;

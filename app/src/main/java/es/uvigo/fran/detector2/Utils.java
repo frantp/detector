@@ -110,7 +110,7 @@ abstract class Utils {
         int r = pointRadius(image);
         Point labelPos = new Point(point.x + r, point.y - r);
         drawPoint(image, point, color);
-        drawText(image, label, labelPos, color, new Point(r, -r));
+        drawText(image, label, labelPos, color.mul(new Scalar(0.5, 0.5, 0.5)), new Point(r, -r));
     }
 
     public static List<Camera.Size> getSupportedVideoSizes() {

@@ -13,6 +13,8 @@
 
 #include <opencv2/calib3d/calib3d.hpp>
 
+#include "Utils.h"
+
 /* Functions headers */
 cv::Point3f CROSS(cv::Point3f v1, cv::Point3f v2);
 double DOT(cv::Point3f v1, cv::Point3f v2);
@@ -118,8 +120,6 @@ bool PnPProblem::estimatePose(const std::vector<cv::Point3f> &list_points3d,
 
     // Pose estimation
 
-    LOGE("%s", MatToString(_d_matrix).c_str());
-
     bool correspondence = cv::solvePnP(list_points3d, list_points2d, _A_matrix, _d_matrix, rvec, tvec,
                                        useExtrinsicGuess, flags);
 
@@ -135,9 +135,9 @@ bool PnPProblem::estimatePose(const std::vector<cv::Point3f> &list_points3d,
 
 // Estimate the pose given a list of 2D/3D correspondences with RANSAC and the method to use
 
-void PnPProblem::estimatePoseRANSAC( const std::vector<cv::Point3f> &list_points3d, // list with model 3D coordinates
+bool PnPProblem::estimatePoseRANSAC( const std::vector<cv::Point3f> &list_points3d, // list with model 3D coordinates
                                      const std::vector<cv::Point2f> &list_points2d,     // list with scene 2D coordinates
-                                     int flags, cv::Mat &inliers, int iterationsCount,  // PnP method; inliers container
+                                     int flags, cv::OutputArray &inliers, int iterationsCount,  // PnP method; inliers container
                                      float reprojectionError, double confidence )    // Ransac parameters
 {
     cv::Mat rvec = cv::Mat::zeros(3, 1, CV_64FC1);          // output rotation vector
@@ -146,22 +146,23 @@ void PnPProblem::estimatePoseRANSAC( const std::vector<cv::Point3f> &list_points
     bool useExtrinsicGuess = false;   // if true the function uses the provided rvec and tvec values as
             // initial approximations of the rotation and translation vectors
 
-    cv::solvePnPRansac(list_points3d, list_points2d, _A_matrix, _d_matrix, rvec, tvec,
-                       useExtrinsicGuess, iterationsCount, reprojectionError, confidence,
-                       inliers, flags);
+    bool correspondence = cv::solvePnPRansac(list_points3d, list_points2d, _A_matrix, _d_matrix, rvec, tvec,
+                                             useExtrinsicGuess, iterationsCount, reprojectionError, confidence,
+                                             inliers, flags);
 
     Rodrigues(rvec,_R_matrix);      // converts Rotation Vector to Matrix
     _t_matrix = tvec;       // set translation matrix
 
     this->set_P_matrix(_R_matrix, _t_matrix); // set rotation-translation matrix
 
+    return correspondence;
 }
 
 // Given the mesh, backproject the 3D points to 2D to verify the pose estimation
 std::vector<cv::Point2f> PnPProblem::verify_points(Mesh *mesh)
 {
   std::vector<cv::Point2f> verified_points_2d;
-  for( int i = 0; i < mesh->getNumVertices(); i++)
+  for( int i = 0; i < mesh->getVertices().size(); i++)
   {
     cv::Point3f point3d = mesh->getVertex(i);
     cv::Point2f point2d = this->backproject3DPoint(point3d);
@@ -199,7 +200,7 @@ cv::Point2f PnPProblem::backproject3DPoint(const cv::Point3f &point3d)
 bool PnPProblem::backproject2DPoint(const Mesh *mesh, const cv::Point2f &point2d, cv::Point3f &point3d)
 {
   // Triangles list of the object mesh
-  std::vector<std::vector<int> > triangles_list = mesh->getTrianglesList();
+  std::vector<std::vector<int> > triangles_list = mesh->getTriangles();
 
   double lambda = 8;
   double u = point2d.x;

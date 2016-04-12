@@ -64,6 +64,11 @@ public class Enroller {
         destroy(nativeAddr);
     }
 
+    public Enroller setDescriptorAlg(int descriptorAlg) {
+        setdescriptorAlg(nativeAddr, descriptorAlg);
+        return this;
+    }
+
     public Enroller setOrbNumFeatures(int orbNumFeatures) {
         setorbNumFeatures(nativeAddr, orbNumFeatures);
         return this;
@@ -109,6 +114,46 @@ public class Enroller {
         return this;
     }
 
+    public Enroller setAkazeDescriptorType(int akazeDescriptorType) {
+        setakazeDescriptorType(nativeAddr, akazeDescriptorType);
+        return this;
+    }
+
+    public Enroller setAkazeDescriptorSize(int akazeDescriptorSize) {
+        setakazeDescriptorSize(nativeAddr, akazeDescriptorSize);
+        return this;
+    }
+
+    public Enroller setAkazeDescriptorChannels(int akazeDescriptorChannels) {
+        setakazeDescriptorChannels(nativeAddr, akazeDescriptorChannels);
+        return this;
+    }
+
+    public Enroller setAkazeThreshold(double akazeThreshold) {
+        setakazeThreshold(nativeAddr, akazeThreshold);
+        return this;
+    }
+
+    public Enroller setAkazeNOctaves(int akazeNOctaves) {
+        setakazeNOctaves(nativeAddr, akazeNOctaves);
+        return this;
+    }
+
+    public Enroller setAkazeNOctaveLayers(int akazeNOctaveLayers) {
+        setakazeNOctaveLayers(nativeAddr, akazeNOctaveLayers);
+        return this;
+    }
+
+    public Enroller setAkazeDiffusivity(int akazeDiffusivity) {
+        setakazeDiffusivity(nativeAddr, akazeDiffusivity);
+        return this;
+    }
+
+    public Enroller setPnpMethod(int pnpMethod) {
+        setpnpMethod(nativeAddr, pnpMethod);
+        return this;
+    }
+
     private static native long create(double[] cameraParams, double[] distCoeffs);
 
     private static native void loadMesh(long addrThis, String path);
@@ -129,6 +174,8 @@ public class Enroller {
 
     private static native void destroy(long addrThis);
 
+    private static native void setdescriptorAlg(long addrThis, int descriptorAlg);
+
     private static native void setorbNumFeatures(long addrThis, int orbNumFeatures);
 
     private static native void setorbScaleFactor(long addrThis, double orbScaleFactor);
@@ -146,4 +193,20 @@ public class Enroller {
     private static native void setorbPatchSize(long addrThis, int orbPatchSize);
 
     private static native void setorbFastThreshold(long addrThis, int orbFastThreshold);
+
+    private static native void setakazeDescriptorType(long addrThis, int akazeDescriptorType);
+
+    private static native void setakazeDescriptorSize(long addrThis, int akazeDescriptorSize);
+
+    private static native void setakazeDescriptorChannels(long addrThis, int akazeDescriptorChannels);
+
+    private static native void setakazeThreshold(long addrThis, double akazeThreshold);
+
+    private static native void setakazeNOctaves(long addrThis, int akazeNOctaves);
+
+    private static native void setakazeNOctaveLayers(long addrThis, int akazeNOctaveLayers);
+
+    private static native void setakazeDiffusivity(long addrThis, int akazeDiffusivity);
+
+    private static native void setpnpMethod(long addrThis, int pnpMethod);
 }

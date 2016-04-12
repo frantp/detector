@@ -26,9 +26,9 @@ public:
   bool intersect_MollerTrumbore(Ray &R, Triangle &T, double *out);
   std::vector<cv::Point2f> verify_points(Mesh *mesh);
   cv::Point2f backproject3DPoint(const cv::Point3f &point3d);
-  bool estimatePose(const std::vector<cv::Point3f> &list_points3d, const std::vector<cv::Point2f> &list_points2d, int flags);
-  void estimatePoseRANSAC(const std::vector<cv::Point3f> &list_points3d, const std::vector<cv::Point2f> &list_points2d,
-                          int flags, cv::Mat &inliers,
+  bool estimatePose(const std::vector<cv::Point3f> &points3d, const std::vector<cv::Point2f> &points2d, int flags);
+  bool estimatePoseRANSAC(const std::vector<cv::Point3f> &points3d, const std::vector<cv::Point2f> &points2d,
+                          int flags, cv::OutputArray &inliers,
                           int iterationsCount, float reprojectionError, double confidence);
 
   cv::Mat get_A_matrix() const { return _A_matrix; }

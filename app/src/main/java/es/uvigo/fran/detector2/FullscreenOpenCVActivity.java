@@ -7,6 +7,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.View;
+import android.view.Window;
 import android.view.WindowManager;
 
 import org.opencv.android.BaseLoaderCallback;
@@ -17,23 +18,32 @@ public abstract class FullscreenOpenCVActivity extends AppCompatActivity {
 
     private static final String TAG = "OPEN_CV";
 
+    private final int mContentView;
+    private final boolean mShowHome;
+
     private View mDecorView;
 
     private boolean mInitialized;
+
+    public FullscreenOpenCVActivity(int contentView, boolean showHome) {
+        super();
+        mContentView = contentView;
+        mShowHome = showHome;
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setRequestedOrientation(ActivityInfo.SCREEN_ORIENTATION_LANDSCAPE);
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
-        setContentView(getContentView());
+        setContentView(mContentView);
 
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(false);
-            actionBar.setDisplayHomeAsUpEnabled(showHome());
+            actionBar.setDisplayHomeAsUpEnabled(mShowHome);
         }
         mInitialized = false;
         mDecorView = getWindow().getDecorView();
@@ -74,19 +84,18 @@ public abstract class FullscreenOpenCVActivity extends AppCompatActivity {
                         | View.SYSTEM_UI_FLAG_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_LAYOUT_FULLSCREEN
                         | View.SYSTEM_UI_FLAG_IMMERSIVE_STICKY
-                //| View.SYSTEM_UI_FLAG_HIDE_NAVIGATION
-                //| View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
+                        | View.SYSTEM_UI_FLAG_LAYOUT_HIDE_NAVIGATION
                 //| View.SYSTEM_UI_FLAG_LOW_PROFILE
         );
+        Window w = getWindow();
+        w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION, WindowManager.LayoutParams.FLAG_TRANSLUCENT_NAVIGATION);
+        w.setFlags(WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS, WindowManager.LayoutParams.FLAG_TRANSLUCENT_STATUS);
     }
 
     protected boolean isInitialized() {
         return mInitialized;
     }
 
-    protected abstract int getContentView();
-
-    protected abstract boolean showHome();
-
-    protected abstract void init();
+    protected void init() {
+    }
 }

@@ -38,6 +38,11 @@ class Detector {
         destroy(nativeAddr);
     }
 
+    public Detector setDescriptorAlg(int descriptorAlg) {
+        setdescriptorAlg(nativeAddr, descriptorAlg);
+        return this;
+    }
+
     public Detector setOrbNumFeatures(int orbNumFeatures) {
         setorbNumFeatures(nativeAddr, orbNumFeatures);
         return this;
@@ -80,6 +85,41 @@ class Detector {
 
     public Detector setOrbFastThreshold(int orbFastThreshold) {
         setorbFastThreshold(nativeAddr, orbFastThreshold);
+        return this;
+    }
+
+    public Detector setAkazeDescriptorType(int akazeDescriptorType) {
+        setakazeDescriptorType(nativeAddr, akazeDescriptorType);
+        return this;
+    }
+
+    public Detector setAkazeDescriptorSize(int akazeDescriptorSize) {
+        setakazeDescriptorSize(nativeAddr, akazeDescriptorSize);
+        return this;
+    }
+
+    public Detector setAkazeDescriptorChannels(int akazeDescriptorChannels) {
+        setakazeDescriptorChannels(nativeAddr, akazeDescriptorChannels);
+        return this;
+    }
+
+    public Detector setAkazeThreshold(double akazeThreshold) {
+        setakazeThreshold(nativeAddr, akazeThreshold);
+        return this;
+    }
+
+    public Detector setAkazeNOctaves(int akazeNOctaves) {
+        setakazeNOctaves(nativeAddr, akazeNOctaves);
+        return this;
+    }
+
+    public Detector setAkazeNOctaveLayers(int akazeNOctaveLayers) {
+        setakazeNOctaveLayers(nativeAddr, akazeNOctaveLayers);
+        return this;
+    }
+
+    public Detector setAkazeDiffusivity(int akazeDiffusivity) {
+        setakazeDiffusivity(nativeAddr, akazeDiffusivity);
         return this;
     }
 
@@ -132,6 +172,8 @@ class Detector {
 
     private static native void destroy(long addrThis);
 
+    private static native void setdescriptorAlg(long addrThis, int descriptorAlg);
+
     private static native void setorbNumFeatures(long addrThis, int orbNumFeatures);
 
     private static native void setorbScaleFactor(long addrThis, double orbScaleFactor);
@@ -149,6 +191,20 @@ class Detector {
     private static native void setorbPatchSize(long addrThis, int orbPatchSize);
 
     private static native void setorbFastThreshold(long addrThis, int orbFastThreshold);
+
+    private static native void setakazeDescriptorType(long addrThis, int akazeDescriptorType);
+
+    private static native void setakazeDescriptorSize(long addrThis, int akazeDescriptorSize);
+
+    private static native void setakazeDescriptorChannels(long addrThis, int akazeDescriptorChannels);
+
+    private static native void setakazeThreshold(long addrThis, double akazeThreshold);
+
+    private static native void setakazeNOctaves(long addrThis, int akazeNOctaves);
+
+    private static native void setakazeNOctaveLayers(long addrThis, int akazeNOctaveLayers);
+
+    private static native void setakazeDiffusivity(long addrThis, int akazeDiffusivity);
 
     private static native void setmatchingRatio(long addrThis, double matchingRatio);
 
